@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recepción de Mercadería — Farmacia Nueva Fulchi</title>
+<style>
+:root {
+  --verde:#27500A;--verde-bg:#EAF3DE;--verde-mid:#639922;--verde-b:#C0DD97;
+  --rojo:#791F1F;--rojo-bg:#FCEBEB;--rojo-b:#F09595;
+  --am:#633806;--am-bg:#FAEEDA;--am-b:#FAC775;
+  --azul:#0C447C;--azul-bg:#E6F1FB;--azul-b:#85B7EB;
+  --gt:#444441;--gl:#F1EFE8;--gb:#D3D1C7;--gm:#888780;
+  --negro:#1a1a1a;--blanco:#ffffff;
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:#f5f4f0;color:var(--gt);min-height:100vh}
+
+/* ── MAIN APP ── */
+.app{display:none}
+.app.visible{display:block}
+.header{background:var(--blanco);border-bottom:1px solid var(--gb);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header-left{display:flex;align-items:center;gap:10px}
+.header-icon{width:34px;height:34px;background:var(--verde-bg);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.header-icon svg{width:18px;height:18px;stroke:var(--verde);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.header h1{font-size:14px;font-weight:600;color:var(--negro)}
+.header p{font-size:11px;color:var(--gm)}
+.tab-bar{display:flex;background:var(--blanco);border-bottom:1px solid var(--gb)}
+.tab{flex:1;padding:11px 0;text-align:center;font-size:12px;font-weight:500;color:var(--gm);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.tab.active{color:var(--azul);border-bottom-color:var(--azul)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* ── PROGRESS ── */
+.prog-wrap{background:var(--blanco);border-bottom:1px solid var(--gb);padding:10px 18px 12px}
+.prog-steps{display:flex;gap:4px;align-items:center;margin-bottom:5px}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--gb);transition:background .2s}
+.step-dot.active{background:var(--verde-mid)}.step-dot.done{background:var(--verde)}
+.prog-label{font-size:11px;color:var(--gm)}
+.prog-label span{color:var(--verde);font-weight:600}
+
+/* ── FORM ── */
+.form-body{padding:14px 14px 88px;max-width:640px;margin:0 auto}
+.section{display:none;animation:fadeIn .2s ease}
+.section.visible{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.sec-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--gb)}
+.sec-num{width:26px;height:26px;border-radius:50%;background:var(--azul);color:var(--blanco);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sec-title{font-size:14px;font-weight:600;color:var(--negro)}
+.sec-sub{font-size:11px;color:var(--gm);margin-top:1px}
+.field{margin-bottom:13px}
+.field label{display:block;font-size:12px;font-weight:500;color:var(--negro);margin-bottom:4px}
+.field label .req{color:#E24B4A;margin-left:2px}
+.field label .hint{font-size:10px;font-weight:400;color:var(--gm);display:block;margin-top:1px}
+input[type=text],input[type=date],input[type=number],input[type=time],select,textarea{width:100%;padding:9px 11px;border:1px solid var(--gb);border-radius:8px;font-size:13px;font-family:var(--font);color:var(--negro);background:var(--blanco);transition:border-color .15s,box-shadow .15s;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--azul-b);box-shadow:0 0 0 3px rgba(55,138,221,.1)}
+textarea{min-height:72px;resize:vertical;line-height:1.5}
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+
+/* nombre empleado con autocompletado */
+.emp-wrap{position:relative}
+.emp-suggestions{position:absolute;top:100%;left:0;right:0;background:var(--blanco);border:1px solid var(--azul-b);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);z-index:50;overflow:hidden;display:none}
+.emp-sug-item{padding:9px 12px;font-size:13px;cursor:pointer;color:var(--negro);display:flex;align-items:center;gap:8px}
+.emp-sug-item:hover{background:var(--azul-bg)}
+.emp-sug-icon{font-size:14px;color:var(--gm)}
+.emp-sug-new{color:var(--azul);font-weight:500}
+
+/* option cards */
+.opt-group{display:flex;flex-direction:column;gap:5px}
+.opt-card{display:flex;align-items:center;gap:9px;padding:9px 11px;border:1px solid var(--gb);border-radius:8px;cursor:pointer;transition:border-color .15s,background .15s;background:var(--blanco);-webkit-tap-highlight-color:transparent}
+.opt-card:hover{border-color:var(--azul-b);background:#fafafa}
+.opt-card input[type=radio],.opt-card input[type=checkbox]{width:auto;padding:0;border:none;box-shadow:none;accent-color:var(--azul)}
+.opt-card.sv{border-color:var(--verde-b);background:var(--verde-bg)}
+.opt-card.sr{border-color:var(--rojo-b);background:var(--rojo-bg)}
+.opt-card.sam{border-color:var(--am-b);background:var(--am-bg)}
+.opt-label{font-size:13px;color:var(--negro)}
+.opt-sub{font-size:10px;color:var(--gm);margin-top:1px}
+
+/* products */
+.prod-list{display:flex;flex-direction:column;gap:9px}
+.prod-row{background:var(--blanco);border:1px solid var(--gb);border-radius:10px;padding:11px}
+.prod-row-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+.prod-row-title{font-size:12px;font-weight:600;color:var(--negro)}
+.btn-rm{background:none;border:none;cursor:pointer;color:var(--gm);font-size:17px;padding:2px 5px;border-radius:4px;transition:color .15s,background .15s}
+.btn-rm:hover{color:var(--rojo);background:var(--rojo-bg)}
+.btn-add{display:flex;align-items:center;justify-content:center;gap:5px;width:100%;padding:9px;border:1.5px dashed var(--gb);border-radius:8px;background:none;font-size:13px;color:var(--azul);font-weight:500;cursor:pointer;transition:border-color .15s,background .15s}
+.btn-add:hover{border-color:var(--azul-b);background:var(--azul-bg)}
+
+/* alert */
+.alert{display:flex;gap:9px;align-items:flex-start;padding:9px 11px;border-radius:8px;margin-bottom:11px;font-size:12px;line-height:1.5}
+.alert-i{font-size:15px;flex-shrink:0;margin-top:1px}
+.al-v{background:var(--verde-bg);color:var(--verde);border:1px solid var(--verde-b)}
+.al-a{background:var(--am-bg);color:var(--am);border:1px solid var(--am-b)}
+.al-r{background:var(--rojo-bg);color:var(--rojo);border:1px solid var(--rojo-b)}
+.al-b{background:var(--azul-bg);color:var(--azul);border:1px solid var(--azul-b)}
+
+/* nav */
+.nav-bar{position:fixed;bottom:0;left:0;right:0;background:var(--blanco);border-top:1px solid var(--gb);padding:10px 14px 16px;display:flex;gap:8px;max-width:640px;margin:0 auto;z-index:100}
+.btn-back{flex:0 0 76px;padding:11px;border:1px solid var(--gb);border-radius:8px;background:var(--blanco);font-size:13px;font-weight:500;color:var(--gt);cursor:pointer;transition:background .15s}
+.btn-back:hover{background:var(--gl)}
+.btn-next{flex:1;padding:11px;border:none;border-radius:8px;background:var(--azul);color:var(--blanco);font-size:13px;font-weight:600;cursor:pointer;transition:background .15s}
+.btn-next:hover{background:#0a3a6b}
+.btn-submit{flex:1;padding:11px;border:none;border-radius:8px;background:var(--verde);color:var(--blanco);font-size:13px;font-weight:600;cursor:pointer;transition:background .15s}
+.btn-submit:hover{background:#1e3d08}
+
+/* summary */
+.sum-card{background:var(--blanco);border:1px solid var(--gb);border-radius:10px;overflow:hidden;margin-bottom:10px}
+.sum-hdr{padding:9px 13px;background:var(--gl);font-size:11px;font-weight:600;color:var(--gm);text-transform:uppercase;letter-spacing:.04em}
+.sum-row{display:flex;justify-content:space-between;padding:7px 13px;border-top:1px solid var(--gb);font-size:12px}
+.sum-row:first-of-type{border-top:none}
+.sum-k{color:var(--gm)}.sum-v{font-weight:500;color:var(--negro);text-align:right;max-width:65%}
+
+/* success */
+.success{display:none;text-align:center;padding:36px 18px}
+.success.visible{display:block}
+.suc-icon{width:60px;height:60px;border-radius:50%;background:var(--verde-bg);margin:0 auto 14px;display:flex;align-items:center;justify-content:center}
+.suc-icon svg{width:30px;height:30px;stroke:var(--verde);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.suc-title{font-size:19px;font-weight:700;color:var(--negro);margin-bottom:7px}
+.suc-sub{font-size:13px;color:var(--gm);line-height:1.6;margin-bottom:20px}
+.suc-id{display:inline-block;padding:7px 18px;background:var(--azul-bg);color:var(--azul);border-radius:20px;font-size:13px;font-weight:600;margin-bottom:20px}
+.btn-nuevo{display:inline-block;padding:11px 24px;background:var(--azul);color:var(--blanco);border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+
+/* HISTORIAL */
+.hist-wrap{padding:14px;max-width:640px;margin:0 auto;padding-bottom:20px}
+.hist-filters{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.hist-filter{padding:6px 12px;border:1px solid var(--gb);border-radius:20px;font-size:12px;background:var(--blanco);color:var(--gt);cursor:pointer;transition:all .15s}
+.hist-filter.active{background:var(--azul);color:var(--blanco);border-color:var(--azul)}
+.hist-empty{text-align:center;padding:40px 20px;color:var(--gm);font-size:13px}
+.hist-card{background:var(--blanco);border:1px solid var(--gb);border-radius:10px;margin-bottom:8px;overflow:hidden;cursor:pointer;transition:border-color .15s}
+.hist-card:hover{border-color:var(--azul-b)}
+.hist-card-header{display:flex;justify-content:space-between;align-items:center;padding:10px 13px}
+.hist-card-left h3{font-size:13px;font-weight:600;color:var(--negro)}
+.hist-card-left p{font-size:11px;color:var(--gm);margin-top:2px}
+.hist-card-body{padding:0 13px 11px;border-top:1px solid var(--gb);display:none}
+.hist-card-body.open{display:block}
+.hist-detail{font-size:11px;color:var(--gt);line-height:1.7;margin-top:8px}
+.hist-detail strong{color:var(--negro)}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+.bv{background:var(--verde-bg);color:var(--verde)}
+.br{background:var(--rojo-bg);color:var(--rojo)}
+.ba{background:var(--am-bg);color:var(--am)}
+
+</style>
+</head>
+<body>
+
+<!-- ══ APP ════════════════════════════════════════════════════════════════ -->
+<div class="app visible" id="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 12h6M9 16h4"/></svg>
+      </div>
+      <div>
+        <h1>Recepción de mercadería</h1>
+        <p>Farmacia Nueva Fulchi</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tab-bar">
+    <div class="tab active" id="tab-form"  onclick="switchTab('form')">Nuevo registro</div>
+    <div class="tab"        id="tab-hist"  onclick="switchTab('hist')">Historial</div>
+  </div>
+
+  <!-- ── TAB: FORMULARIO ── -->
+  <div class="tab-content active" id="tc-form">
+    <div class="prog-wrap" id="progressWrap">
+      <div class="prog-steps" id="progressDots"></div>
+      <div class="prog-label" id="progressLabel"></div>
+    </div>
+    <div class="form-body" id="formBody">
+
+      <!-- S1 -->
+      <div class="section visible" data-section="0">
+        <div class="sec-header"><div class="sec-num">1</div><div><div class="sec-title">Datos de la entrega</div><div class="sec-sub">Información general de esta recepción</div></div></div>
+        <div class="alert al-b"><span class="alert-i">ℹ</span><span>Completá con los bultos frente a vos. Campos con <span style="color:#E24B4A;font-weight:700">*</span> son obligatorios.</span></div>
+
+        <div class="field">
+          <label>Droguería / Proveedor <span class="req">*</span></label>
+          <select id="proveedor" required>
+            <option value="">Seleccionar...</option>
+            <option>Suizo Argentina</option>
+            <option>Asoprofarma Cooperativa</option>
+            <option>Cofaloza Cooperativa</option>
+            <option>Otro proveedor menor</option>
+            <option>Compra directa a laboratorio</option>
+          </select>
+        </div>
+        <div class="row-2">
+          <div class="field"><label>Fecha <span class="req">*</span></label><input type="date" id="fecha" required></div>
+          <div class="field"><label>Hora <span class="req">*</span></label><input type="time" id="hora" required></div>
+        </div>
+        <div class="field">
+          <label>Turno <span class="req">*</span></label>
+          <div class="opt-group">
+            <label class="opt-card" onclick="selRad(this,'turno','m')"><input type="radio" name="turno" value="m"><div><div class="opt-label">Mañana (8–14 h)</div><div class="opt-sub">Primera entrega del día</div></div></label>
+            <label class="opt-card" onclick="selRad(this,'turno','t')"><input type="radio" name="turno" value="t"><div><div class="opt-label">Tarde (14–20 h)</div><div class="opt-sub">Segunda entrega del día</div></div></label>
+          </div>
+        </div>
+
+        <!-- NOMBRE EMPLEADO CON MEMORIA -->
+        <div class="field">
+          <label>Nombre del empleado <span class="req">*</span><span class="hint">Escribí tu nombre — se guardará para la próxima vez</span></label>
+          <div class="emp-wrap">
+            <input type="text" id="empleado" placeholder="Ej: María González" autocomplete="off" required oninput="empInput()" onblur="empBlur()" onfocus="empFocus()">
+            <div class="emp-suggestions" id="empSug"></div>
+          </div>
+        </div>
+
+        <div class="field"><label>N° de remito <span class="req">*</span></label><input type="text" id="remito" placeholder="Ej: REM-2025-004521" required></div>
+        <div class="field"><label>Cantidad de bultos <span class="req">*</span></label><input type="number" id="bultos" min="1" placeholder="Ej: 3" required></div>
+      </div>
+
+      <!-- S2 -->
+      <div class="section" data-section="1">
+        <div class="sec-header"><div class="sec-num">2</div><div><div class="sec-title">Verificación</div><div class="sec-sub">Control punto por punto antes de aceptar</div></div></div>
+
+        <div class="field">
+          <label>1. Coincidencia con el pedido <span class="req">*</span><span class="hint">¿Los productos y cantidades coinciden con lo pedido?</span></label>
+          <div class="opt-group">
+            <label class="opt-card" onclick="selRad(this,'coinc','ok')"><input type="radio" name="coinc" value="ok"><div><div class="opt-label" style="color:var(--verde)">✓ Conforme</div></div></label>
+            <label class="opt-card" onclick="selRad(this,'coinc','parcial')"><input type="radio" name="coinc" value="parcial"><div><div class="opt-label" style="color:var(--am)">⚠ Parcial — faltan o sobran unidades</div></div></label>
+            <label class="opt-card" onclick="selRad(this,'coinc','nc')"><input type="radio" name="coinc" value="nc"><div><div class="opt-label" style="color:var(--rojo)">✗ No conforme — producto equivocado</div></div></label>
+          </div>
+        </div>
+        <div class="field">
+          <label>2. Fechas de vencimiento <span class="req">*</span><span class="hint">Mínimo 90 días a partir de hoy</span></label>
+          <div class="opt-group">
+            <label class="opt-card" onclick="selRad(this,'venc','ok')"><input type="radio" name="venc" value="ok"><div><div class="opt-label" style="color:var(--verde)">✓ Todos aceptables</div></div></label>
+            <label class="opt-card" onclick="selRad(this,'venc','prox')"><input type="radio" name="venc" value="prox"><div><div class="opt-label" style="color:var(--am)">⚠ Algunos vencen pronto</div><div class="opt-sub">Aclarar en observaciones</div></div></label>
+            <label class="opt-card" onclick="selRad(this,'venc','rec')"><input type="radio" name="venc" value="rec"><div><div class="opt-label" style="color:var(--rojo)">✗ Vencidos o menos de 90 días</div></div></label>
+          </div>
+        </div>
+        <div class="field">
+          <label>3. Estado del envase <span class="req">*</span><span class="hint">Envase íntegro, sin golpes, humedad ni identificación dañada</span></label>
+          <div class="opt-group">
+            <label class="opt-card" onclick="selRad(this,'envase','ok')"><input type="radio" name="envase" value="ok"><div><div class="opt-label" style="color:var(--verde)">✓ Todos en buen estado</div></div></label>
+            <label class="opt-card" onclick="selRad(this,'envase','dan')"><input type="radio" name="envase" value="dan"><div><div class="opt-label" style="color:var(--am)">⚠ Daño menor en algunos</div><div class="opt-sub">Detallar en observaciones</div></div></label>
+            <label class="opt-card" onclick="selRad(this,'envase','rec')"><input type="radio" name="envase" value="rec"><div><div class="opt-label" style="color:var(--rojo)">✗ Rechazados por daño</div></div></label>
+          </div>
+        </div>
+        <div class="field">
+          <label>4. Cadena de frío <span class="req">*</span></label>
+          <div class="opt-group">
+            <label class="opt-card" onclick="selRad(this,'frio','na');hidetemp()"><input type="radio" name="frio" value="na"><div><div class="opt-label">No aplica</div></div></label>
+            <label class="opt-card" onclick="selRad(this,'frio','ok');showtemp()"><input type="radio" name="frio" value="ok"><div><div class="opt-label" style="color:var(--verde)">✓ Íntegra</div><div class="opt-sub">Temperatura dentro del rango</div></div></label>
+            <label class="opt-card" onclick="selRad(this,'frio','int');showtemp()"><input type="radio" name="frio" value="int"><div><div class="opt-label" style="color:var(--rojo)">✗ Cadena interrumpida</div></div></label>
+          </div>
+        </div>
+        <div class="field" id="tempField" style="display:none">
+          <label>Temperatura registrada (°C)</label>
+          <input type="number" id="temperatura" step="0.1" placeholder="Ej: 5.2">
+        </div>
+        <div class="field">
+          <label>5. Documentación del remito <span class="req">*</span></label>
+          <div class="opt-group">
+            <label class="opt-card" onclick="selRad(this,'doc','ok')"><input type="radio" name="doc" value="ok"><div><div class="opt-label" style="color:var(--verde)">✓ Completa y correcta</div></div></label>
+            <label class="opt-card" onclick="selRad(this,'doc','inc')"><input type="radio" name="doc" value="inc"><div><div class="opt-label" style="color:var(--am)">⚠ Incompleta o con errores</div></div></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- S3 -->
+      <div class="section" data-section="2">
+        <div class="sec-header"><div class="sec-num">3</div><div><div class="sec-title">Detalle de productos</div><div class="sec-sub">Registrá los productos principales recibidos</div></div></div>
+        <div class="alert al-b"><span class="alert-i">ℹ</span><span>Obligatorio para <strong>refrigerados</strong> y <strong>psicotrópicos</strong>. Para el resto, podés agregar una línea por categoría.</span></div>
+        <div class="prod-list" id="productList"></div>
+        <button class="btn-add" onclick="addProduct()">+ Agregar producto / línea</button>
+      </div>
+
+      <!-- S4 -->
+      <div class="section" data-section="3">
+        <div class="sec-header"><div class="sec-num">4</div><div><div class="sec-title">Resultado y cierre</div><div class="sec-sub">Resultado global de esta recepción</div></div></div>
+        <div class="field">
+          <label>Resultado global <span class="req">*</span></label>
+          <div class="opt-group">
+            <label class="opt-card" onclick="selRad(this,'res','ac')"><input type="radio" name="res" value="ac"><div><div class="opt-label" style="color:var(--verde)">✓ Aceptado — toda la mercadería ingresa</div></div></label>
+            <label class="opt-card" onclick="selRad(this,'res','ap')"><input type="radio" name="res" value="ap"><div><div class="opt-label" style="color:var(--am)">⚠ Aceptado parcialmente</div><div class="opt-sub">Ítems rechazados quedan para devolución</div></div></label>
+            <label class="opt-card" onclick="selRad(this,'res','re')"><input type="radio" name="res" value="re"><div><div class="opt-label" style="color:var(--rojo)">✗ Rechazado — toda la entrega devuelta</div></div></label>
+          </div>
+        </div>
+        <div class="field">
+          <label>¿Se notificó a la droguería?</label>
+          <div class="opt-group">
+            <label class="opt-card" onclick="selRad(this,'notif','no')"><input type="radio" name="notif" value="no"><div><div class="opt-label">No fue necesario</div></div></label>
+            <label class="opt-card" onclick="selRad(this,'notif','tel')"><input type="radio" name="notif" value="tel"><div><div class="opt-label">Sí — por teléfono</div></div></label>
+            <label class="opt-card" onclick="selRad(this,'notif','wp')"><input type="radio" name="notif" value="wp"><div><div class="opt-label">Sí — por WhatsApp</div></div></label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Observaciones<span class="hint">Vencimientos próximos, faltantes, daños, aclaraciones</span></label>
+          <textarea id="obs" placeholder="Ej: Faltaron 2 unidades de Ibuprofeno 400 mg. Se comunicó a Suizo Argentina."></textarea>
+        </div>
+        <div class="field">
+          <label>Confirmación del responsable <span class="req">*</span></label>
+          <label class="opt-card" id="confirmCard" onclick="toggleConfirm()">
+            <input type="checkbox" id="confirmar">
+            <div><div class="opt-label">Confirmo que verifiqué la mercadería y los datos son correctos</div><div class="opt-sub" id="empConfirmName">—</div></div>
+          </label>
+        </div>
+      </div>
+
+      <!-- S5 Resumen -->
+      <div class="section" data-section="4">
+        <div class="sec-header"><div class="sec-num">5</div><div><div class="sec-title">Resumen</div><div class="sec-sub">Revisá antes de enviar</div></div></div>
+        <div id="summaryContent"></div>
+      </div>
+
+    </div><!-- /form-body -->
+
+    <!-- Success -->
+    <div class="success" id="successScreen">
+      <div class="suc-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="suc-title">Recepción registrada</div>
+      <div class="suc-sub">Registro guardado con fecha y hora.<br>Podés cerrar o registrar otra recepción.</div>
+      <div class="suc-id" id="successId"></div>
+      <br>
+      <button class="btn-nuevo" onclick="resetForm()">Registrar otra recepción</button>
+      <div style="margin-top:18px;padding:12px;background:var(--azul-bg);border-radius:10px;text-align:left">
+        <p style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:5px">Próximos pasos</p>
+        <p style="font-size:11px;color:var(--gt);line-height:1.7">
+          1. Trasladá la mercadería aceptada al depósito.<br>
+          2. Cargá en Zetti: nombre, lote, vencimiento, cantidad.<br>
+          3. Ubicá según zonificación ABC vigente.<br>
+          4. Ítems rechazados: zona de devoluciones, coordinar retiro.
+        </p>
+      </div>
+    </div>
+
+    <!-- Nav bar -->
+    <div class="nav-bar" id="navBar">
+      <button class="btn-back" id="btnBack" onclick="goBack()" style="display:none">← Volver</button>
+      <button class="btn-next" id="btnNext" onclick="goNext()">Continuar →</button>
+    </div>
+  </div><!-- /tc-form -->
+
+  <!-- ── TAB: HISTORIAL ── -->
+  <div class="tab-content" id="tc-hist">
+    <div class="hist-wrap">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:600;color:var(--negro)" id="histCount"></div>
+        <button onclick="clearHist()" style="font-size:11px;color:var(--rojo);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid var(--rojo-b)">Borrar todo</button>
+      </div>
+      <div class="hist-filters">
+        <div class="hist-filter active" onclick="filterHist('all',this)">Todos</div>
+        <div class="hist-filter" onclick="filterHist('ac',this)">Aceptados</div>
+        <div class="hist-filter" onclick="filterHist('ap',this)">Parciales</div>
+        <div class="hist-filter" onclick="filterHist('re',this)">Rechazados</div>
+      </div>
+      <div id="histList"></div>
+    </div>
+  </div>
+
+  </div><!-- /app -->
+
+<script>
+// ══ CONFIG ═════════════════════════════════════════════════════════════════
+const STORAGE_KEY = 'fnf_recepciones_v2';
+const EMP_KEY     = 'fnf_empleados_v2';
+const SECTIONS    = 5;
+const STEP_NAMES  = ['Datos','Verificación','Productos','Resultado','Resumen'];
+
+// ══ STATE ══════════════════════════════════════════════════════════════════
+let current = 0;
+let prodCount = 0;
+
+
+// ══ INIT ═══════════════════════════════════════════════════════════════════
+function initApp() {
+  const now = new Date();
+  document.getElementById('fecha').value = now.toISOString().split('T')[0];
+  document.getElementById('hora').value  = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  renderProgress();
+  if (document.getElementById('productList').children.length === 0) addProduct();
+  renderHist('all');
+}
+
+// ══ TABS ═══════════════════════════════════════════════════════════════════
+function switchTab(name) {
+  ['form','hist'].forEach(t => {
+    document.getElementById('tab-'+t).classList.toggle('active', t===name);
+    document.getElementById('tc-'+t).classList.toggle('active', t===name);
+  });
+  document.getElementById('navBar').style.display = name==='form' ? 'flex' : 'none';
+  if (name==='hist') renderHist(currentFilter||'all');
+}
+
+// ══ PROGRESS ═══════════════════════════════════════════════════════════════
+function renderProgress() {
+  const dots = document.getElementById('progressDots');
+  dots.innerHTML = '';
+  for (let i=0;i<SECTIONS;i++) {
+    const d = document.createElement('div');
+    d.className = 'step-dot'+(i<current?' done':i===current?' active':'');
+    dots.appendChild(d);
+    if (i<SECTIONS-1) {
+      const s = document.createElement('div');
+      s.style.cssText = 'flex:1;height:2px;background:'+(i<current?'var(--verde)':'var(--gb)');
+      dots.appendChild(s);
+    }
+  }
+  document.getElementById('progressLabel').innerHTML = `<span>Paso ${current+1} de ${SECTIONS}</span> — ${STEP_NAMES[current]}`;
+}
+
+// ══ NAV ════════════════════════════════════════════════════════════════════
+function showSection(idx) {
+  document.querySelectorAll('.section').forEach((s,i) => s.classList.toggle('visible',i===idx));
+  const back = document.getElementById('btnBack');
+  const next = document.getElementById('btnNext');
+  back.style.display = idx>0 ? 'block' : 'none';
+  if (idx===SECTIONS-1) { next.textContent='Enviar registro ✓'; next.className='btn-submit'; next.onclick=submitForm; }
+  else { next.textContent='Continuar →'; next.className='btn-next'; next.onclick=goNext; }
+  window.scrollTo(0,0);
+}
+function goNext() { if (!validate(current)) return; if (current===SECTIONS-2) buildSummary(); current++; renderProgress(); showSection(current); }
+function goBack() { if (current>0) { current--; renderProgress(); showSection(current); } }
+
+// ══ VALIDATE ═══════════════════════════════════════════════════════════════
+function validate(idx) {
+  if (idx===0) {
+    if (!document.getElementById('proveedor').value) { toast('Seleccioná un proveedor'); return false; }
+    if (!document.getElementById('fecha').value)     { toast('Indicá la fecha'); return false; }
+    if (!document.getElementById('hora').value)      { toast('Indicá la hora'); return false; }
+    if (!document.querySelector('[name=turno]:checked')) { toast('Seleccioná el turno'); return false; }
+    if (!document.getElementById('empleado').value.trim()) { toast('Ingresá tu nombre'); return false; }
+    if (!document.getElementById('remito').value.trim())   { toast('Ingresá el N° de remito'); return false; }
+    if (!document.getElementById('bultos').value)         { toast('Indicá la cantidad de bultos'); return false; }
+    saveEmployee(document.getElementById('empleado').value.trim());
+  }
+  if (idx===1) {
+    for (const n of ['coinc','venc','envase','frio','doc']) {
+      if (!document.querySelector(`[name=${n}]:checked`)) { toast('Completá todos los puntos de verificación'); return false; }
+    }
+  }
+  if (idx===3) {
+    if (!document.querySelector('[name=res]:checked'))  { toast('Seleccioná el resultado'); return false; }
+    if (!document.getElementById('confirmar').checked)  { toast('Confirmá tu responsabilidad'); return false; }
+    document.getElementById('empConfirmName').textContent = document.getElementById('empleado').value || '—';
+  }
+  return true;
+}
+
+// ══ RADIO CARDS ════════════════════════════════════════════════════════════
+function selRad(card, name, val) {
+  document.querySelectorAll(`[name="${name}"]`).forEach(r => {
+    const p = r.closest('.opt-card');
+    if (p) p.classList.remove('sv','sr','sam');
+  });
+  const r = card.querySelector('input[type=radio]');
+  if (r) r.checked = true;
+  const pos = ['ok','ac','na','no'].includes(val) ? 'sv' : ['parcial','prox','dan','ap','inc','tel','wp'].includes(val) ? 'sam' : 'sr';
+  card.classList.add(pos);
+}
+function toggleConfirm() {
+  const cb = document.getElementById('confirmar');
+  cb.checked = !cb.checked;
+  document.getElementById('confirmCard').classList.toggle('sv', cb.checked);
+}
+function showtemp() { document.getElementById('tempField').style.display='block'; }
+function hidetemp() { document.getElementById('tempField').style.display='none'; }
+
+// ══ EMPLOYEE MEMORY ════════════════════════════════════════════════════════
+function getEmployees() { try { return JSON.parse(localStorage.getItem(EMP_KEY)||'[]'); } catch(e){ return []; } }
+function saveEmployee(name) {
+  if (!name) return;
+  let emps = getEmployees().filter(e => e.toLowerCase() !== name.toLowerCase());
+  emps.unshift(name);
+  emps = emps.slice(0,10);
+  localStorage.setItem(EMP_KEY, JSON.stringify(emps));
+}
+function empInput() {
+  const val = document.getElementById('empleado').value.toLowerCase();
+  const emps = getEmployees().filter(e => e.toLowerCase().includes(val) && e.toLowerCase() !== val);
+  renderEmpSug(emps, val);
+}
+function empFocus() {
+  const emps = getEmployees();
+  renderEmpSug(emps, '');
+}
+function empBlur() { setTimeout(()=>{ const s=document.getElementById('empSug'); if(s) s.style.display='none'; },200); }
+function renderEmpSug(emps, typed) {
+  const sug = document.getElementById('empSug');
+  if (!sug) return;
+  sug.innerHTML = '';
+  if (emps.length === 0 && !typed) { sug.style.display='none'; return; }
+  if (emps.length > 0) {
+    emps.forEach(e => {
+      const item = document.createElement('div');
+      item.className = 'emp-sug-item';
+      item.innerHTML = `<span class="emp-sug-icon">👤</span>${e}`;
+      item.onmousedown = () => { document.getElementById('empleado').value = e; sug.style.display='none'; };
+      sug.appendChild(item);
+    });
+  }
+  if (typed && typed.length > 1) {
+    const capitalized = typed.charAt(0).toUpperCase() + typed.slice(1);
+    const exists = emps.some(e => e.toLowerCase() === typed);
+    if (!exists) {
+      const item = document.createElement('div');
+      item.className = 'emp-sug-item';
+      item.innerHTML = `<span class="emp-sug-icon">➕</span><span class="emp-sug-new">Guardar "${capitalized}" como nuevo</span>`;
+      item.onmousedown = () => { document.getElementById('empleado').value = capitalized; saveEmployee(capitalized); sug.style.display='none'; };
+      sug.appendChild(item);
+    }
+  }
+  sug.style.display = sug.children.length > 0 ? 'block' : 'none';
+}
+
+// ══ PRODUCTS ═══════════════════════════════════════════════════════════════
+function addProduct() {
+  prodCount++;
+  const n = prodCount;
+  const list = document.getElementById('productList');
+  const row = document.createElement('div');
+  row.className = 'prod-row'; row.id = 'prod-'+n;
+  row.innerHTML = `
+    <div class="prod-row-header"><div class="prod-row-title">Producto ${n}</div><button class="btn-rm" onclick="removeProd(${n})">×</button></div>
+    <div class="field"><label>Nombre</label><input type="text" placeholder="Ej: Ibuprofeno 400 mg x 20" id="p${n}_n"></div>
+    <div class="row-2">
+      <div class="field"><label>Lote</label><input type="text" placeholder="Ej: L24-08193" id="p${n}_l"></div>
+      <div class="field"><label>Vencimiento</label><input type="date" id="p${n}_v"></div>
+    </div>
+    <div class="row-2">
+      <div class="field"><label>Cantidad</label><input type="number" min="0" placeholder="Ej: 24" id="p${n}_c"></div>
+      <div class="field"><label>Unidad</label><select id="p${n}_u"><option>unidades</option><option>cajas</option><option>frascos</option><option>ampollas</option><option>blísteres</option><option>kg</option><option>litros</option></select></div>
+    </div>
+    <div class="field"><label>Estado</label><select id="p${n}_e"><option value="ok">✓ Aceptado</option><option value="obs">⚠ Con observación</option><option value="rec">✗ Rechazado</option></select></div>
+    <div class="field"><label>Observación</label><input type="text" placeholder="Opcional" id="p${n}_o"></div>
+  `;
+  list.appendChild(row);
+}
+function removeProd(n) { const e=document.getElementById('prod-'+n); if(e) e.remove(); }
+
+// ══ SUMMARY ════════════════════════════════════════════════════════════════
+function g(id) { return document.getElementById(id)?.value || '—'; }
+function rv(name) { return document.querySelector(`[name="${name}"]:checked`)?.value || '—'; }
+function badge(v) {
+  const m = {ok:'<span class="tag tg">Conforme</span>',parcial:'<span class="tag ta">Parcial</span>',prox:'<span class="tag ta">Próximo</span>',dan:'<span class="tag ta">Daño menor</span>',inc:'<span class="tag ta">Incompleto</span>',na:'<span class="tag tg">No aplica</span>',nc:'<span class="tag tr">No conforme</span>',rec:'<span class="tag tr">Rechazado</span>',int:'<span class="tag tr">Interrumpida</span>',ac:'<span class="tag tg">Aceptado</span>',ap:'<span class="tag ta">Parcial</span>',re:'<span class="tag tr">Rechazado</span>',no:'<span class="tag tg">No necesario</span>',tel:'<span class="tag ta">Sí (tel)</span>',wp:'<span class="tag ta">Sí (WA)</span>'};
+  return m[v] || `<span class="tag">${v}</span>`;
+}
+function buildSummary() {
+  const prods = [];
+  for (let i=1;i<=prodCount;i++) {
+    const el=document.getElementById('prod-'+i); if(!el) continue;
+    const nm=document.getElementById('p'+i+'_n')?.value; if(!nm) continue;
+    prods.push({nm, l:g('p'+i+'_l'), v:g('p'+i+'_v'), c:g('p'+i+'_c')+' '+g('p'+i+'_u'), e:document.getElementById('p'+i+'_e')?.value, o:g('p'+i+'_o')});
+  }
+  const eb = {ok:'<span class="tag tg">Aceptado</span>',obs:'<span class="tag ta">Observación</span>',rec:'<span class="tag tr">Rechazado</span>'};
+  let ph = prods.map(p=>`<div class="sum-row"><span class="sum-k">${p.nm}</span><span class="sum-v">${eb[p.e]||''}<br><span style="font-size:10px;color:var(--gm)">Lote: ${p.l} · Venc: ${p.v} · ${p.c}${p.o&&p.o!=='—'?'<br>Obs: '+p.o:''}</span></span></div>`).join('');
+  document.getElementById('summaryContent').innerHTML = `
+    <div class="sum-card"><div class="sum-hdr">Datos de la entrega</div>
+      <div class="sum-row"><span class="sum-k">Proveedor</span><span class="sum-v">${g('proveedor')}</span></div>
+      <div class="sum-row"><span class="sum-k">Fecha / hora</span><span class="sum-v">${g('fecha')} ${g('hora')}</span></div>
+      <div class="sum-row"><span class="sum-k">Turno</span><span class="sum-v">${rv('turno')==='m'?'Mañana':'Tarde'}</span></div>
+      <div class="sum-row"><span class="sum-k">Empleado</span><span class="sum-v">${g('empleado')}</span></div>
+      <div class="sum-row"><span class="sum-k">Remito</span><span class="sum-v">${g('remito')}</span></div>
+      <div class="sum-row"><span class="sum-k">Bultos</span><span class="sum-v">${g('bultos')}</span></div>
+    </div>
+    <div class="sum-card"><div class="sum-hdr">Verificación</div>
+      <div class="sum-row"><span class="sum-k">Coincidencia</span><span class="sum-v">${badge(rv('coinc'))}</span></div>
+      <div class="sum-row"><span class="sum-k">Vencimientos</span><span class="sum-v">${badge(rv('venc'))}</span></div>
+      <div class="sum-row"><span class="sum-k">Envases</span><span class="sum-v">${badge(rv('envase'))}</span></div>
+      <div class="sum-row"><span class="sum-k">Cadena de frío</span><span class="sum-v">${badge(rv('frio'))}</span></div>
+      <div class="sum-row"><span class="sum-k">Documentación</span><span class="sum-v">${badge(rv('doc'))}</span></div>
+    </div>
+    ${prods.length>0?`<div class="sum-card"><div class="sum-hdr">Productos (${prods.length})</div>${ph}</div>`:''}
+    <div class="sum-card"><div class="sum-hdr">Resultado</div>
+      <div class="sum-row"><span class="sum-k">Resultado</span><span class="sum-v">${badge(rv('res'))}</span></div>
+      <div class="sum-row"><span class="sum-k">Notificación</span><span class="sum-v">${badge(rv('notif'))}</span></div>
+      ${g('obs')!=='—'?`<div class="sum-row"><span class="sum-k">Observaciones</span><span class="sum-v" style="font-style:italic">${g('obs')}</span></div>`:''}
+    </div>`;
+}
+
+// ══ SUBMIT ═════════════════════════════════════════════════════════════════
+function submitForm() {
+  const now = new Date();
+  const id = 'REC-'+now.getFullYear()+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+'-'+String(Math.floor(Math.random()*9000)+1000);
+  const prods = [];
+  for (let i=1;i<=prodCount;i++) {
+    const el=document.getElementById('prod-'+i); if(!el) continue;
+    const nm=document.getElementById('p'+i+'_n')?.value; if(!nm) continue;
+    prods.push({nombre:nm,lote:g('p'+i+'_l'),venc:g('p'+i+'_v'),cant:g('p'+i+'_c')+' '+g('p'+i+'_u'),estado:document.getElementById('p'+i+'_e')?.value,obs:g('p'+i+'_o')});
+  }
+  const record = {
+    id, ts: now.toISOString(),
+    proveedor:g('proveedor'), fecha:g('fecha'), hora:g('hora'),
+    turno:rv('turno')==='m'?'Mañana':'Tarde',
+    empleado:g('empleado'), remito:g('remito'), bultos:g('bultos'),
+    coinc:rv('coinc'), venc:rv('venc'), envase:rv('envase'),
+    frio:rv('frio'), temp:g('temperatura'), doc:rv('doc'),
+    productos:prods, resultado:rv('res'),
+    notif:rv('notif'), obs:g('obs')
+  };
+  const recs = getRecords();
+  recs.unshift(record);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(recs.slice(0,200)));
+  document.getElementById('successId').textContent = 'ID: '+id;
+  document.getElementById('formBody').style.display='none';
+  document.getElementById('progressWrap').style.display='none';
+  document.getElementById('navBar').style.display='none';
+  document.getElementById('successScreen').classList.add('visible');
+  window.scrollTo(0,0);
+}
+function resetForm() { location.reload(); }
+
+// ══ HISTORIAL ══════════════════════════════════════════════════════════════
+function getRecords() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); } catch(e){ return []; } }
+let currentFilter = 'all';
+function filterHist(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.hist-filter').forEach(e=>e.classList.remove('active'));
+  el.classList.add('active');
+  renderHist(f);
+}
+function renderHist(f) {
+  let recs = getRecords();
+  if (f!=='all') recs = recs.filter(r=>r.resultado===f);
+  const list = document.getElementById('histList');
+  const count = document.getElementById('histCount');
+  count.textContent = `${recs.length} registro${recs.length!==1?'s':''}`;
+  if (recs.length===0) { list.innerHTML='<div class="hist-empty">No hay registros aún.<br>Las recepciones aparecerán aquí.</div>'; return; }
+  const rb = {ac:'<span class="badge bv">Aceptado</span>',ap:'<span class="badge ba">Parcial</span>',re:'<span class="badge br">Rechazado</span>'};
+  list.innerHTML = recs.map((r,i)=>{
+    const d = new Date(r.ts);
+    const fecha = d.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'});
+    const hora  = d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+    const prodsHTML = r.productos?.length ? r.productos.map(p=>`<div style="font-size:11px;color:var(--gt);margin-top:3px">· ${p.nombre} — ${p.cant} — Lote: ${p.lote}</div>`).join('') : '';
+    return `<div class="hist-card" onclick="toggleHistCard(${i})">
+      <div class="hist-card-header">
+        <div class="hist-card-left"><h3>${r.proveedor}</h3><p>${fecha} ${hora} · ${r.turno} · ${r.empleado}</p></div>
+        ${rb[r.resultado]||''}
+      </div>
+      <div class="hist-card-body" id="hcb-${i}">
+        <div class="hist-detail">
+          <strong>Remito:</strong> ${r.remito} &nbsp;·&nbsp; <strong>Bultos:</strong> ${r.bultos}<br>
+          <strong>Verificación:</strong> Coincidencia: ${r.coinc} · Venc: ${r.venc} · Envases: ${r.envase} · Frío: ${r.frio}<br>
+          ${r.productos?.length?`<strong>Productos (${r.productos.length}):</strong>${prodsHTML}<br>`:''}
+          ${r.obs&&r.obs!=='—'?`<strong>Obs:</strong> <em>${r.obs}</em><br>`:''}
+          <strong>ID:</strong> ${r.id}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function toggleHistCard(i) {
+  const b = document.getElementById('hcb-'+i);
+  if (b) b.classList.toggle('open');
+}
+function clearHist() {
+  if (confirm('¿Borrar todos los registros? Esta acción no se puede deshacer.')) {
+    localStorage.removeItem(STORAGE_KEY);
+    renderHist('all');
+  }
+}
+
+// ══ TOAST ══════════════════════════════════════════════════════════════════
+function toast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) {
+    t = document.createElement('div'); t.id='_toast';
+    t.style.cssText='position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:9px 16px;border-radius:20px;font-size:12px;font-weight:500;z-index:999;white-space:nowrap;transition:opacity .3s;pointer-events:none';
+    document.body.appendChild(t);
+  }
+  t.textContent=msg; t.style.opacity='1';
+  clearTimeout(t._t); t._t=setTimeout(()=>t.style.opacity='0',2200);
+}
+initApp();
+</script>
+</body>
+</html>
