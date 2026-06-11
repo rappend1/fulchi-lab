@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asistente FullFarma</title>
+<style>
+:root{
+  --v:#27500A;--vbg:#EAF3DE;--vmid:#639922;--vb:#C0DD97;
+  --az:#0C447C;--abg:#E6F1FB;--ab:#85B7EB;
+  --gb:#D3D1C7;--gl:#F4F2EB;--gm:#888780;--gt:#444441;
+  --negro:#1a1a1a;--blanco:#ffffff;
+  --f:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --wa:#25D366;--wa-dark:#128C7E;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+
+/* Cuando se embebe en geco, ocupa todo el viewport */
+html,body{height:100%;font-family:var(--f);background:var(--gl)}
+
+/* ── CONTENEDOR PRINCIPAL ── */
+.chat-wrap{
+  max-width:520px;margin:0 auto;
+  min-height:100vh;display:flex;flex-direction:column;
+  background:var(--blanco);
+  box-shadow:0 0 0 1px var(--gb);
+}
+
+/* ── HEADER ── */
+.chat-header{
+  background:var(--v);color:var(--blanco);
+  padding:14px 18px;display:flex;align-items:center;gap:12px;
+  position:sticky;top:0;z-index:10;
+}
+.chat-avatar{
+  width:42px;height:42px;border-radius:50%;
+  background:rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.chat-avatar svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.chat-header-text h1{font-size:15px;font-weight:600;line-height:1.2}
+.chat-header-text p{font-size:11px;opacity:.8;margin-top:1px;display:flex;align-items:center;gap:4px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;flex-shrink:0}
+
+/* ── MENSAJES ── */
+.chat-body{
+  flex:1;padding:16px 14px 8px;
+  display:flex;flex-direction:column;gap:10px;
+  overflow-y:auto;
+}
+
+/* Burbuja bot */
+.msg-bot{
+  display:flex;align-items:flex-end;gap:8px;
+  max-width:88%;animation:fadeUp .25s ease;
+}
+.bot-icon{
+  width:28px;height:28px;border-radius:50%;background:var(--vbg);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-bottom:2px;
+}
+.bot-icon svg{width:15px;height:15px;stroke:var(--v);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.bubble-bot{
+  background:var(--gl);border:1px solid var(--gb);border-radius:16px 16px 16px 4px;
+  padding:10px 14px;font-size:14px;line-height:1.55;color:var(--negro);
+}
+.bubble-bot strong{color:var(--v)}
+
+/* Burbuja usuario */
+.msg-user{
+  align-self:flex-end;
+  background:var(--v);color:#fff;
+  border-radius:16px 16px 4px 16px;
+  padding:9px 14px;font-size:14px;line-height:1.5;
+  max-width:80%;animation:fadeUp .2s ease;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* Typing indicator */
+.typing{display:flex;align-items:flex-end;gap:8px;max-width:88%}
+.typing-bubble{
+  background:var(--gl);border:1px solid var(--gb);
+  border-radius:16px 16px 16px 4px;
+  padding:12px 16px;display:flex;gap:5px;align-items:center;
+}
+.typing-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--gm);
+  animation:bounce .9s ease-in-out infinite;
+}
+.typing-dot:nth-child(2){animation-delay:.15s}
+.typing-dot:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+/* ── BOTONES DE OPCIONES ── */
+.options-wrap{
+  padding:10px 14px 14px;
+  display:flex;flex-direction:column;gap:7px;
+}
+.opt-btn{
+  width:100%;padding:11px 16px;
+  background:var(--blanco);border:1.5px solid var(--gb);border-radius:10px;
+  font-size:13.5px;font-family:var(--f);color:var(--negro);
+  cursor:pointer;text-align:left;
+  transition:border-color .15s,background .15s,transform .1s;
+  display:flex;align-items:center;gap:10px;
+  -webkit-tap-highlight-color:transparent;
+}
+.opt-btn:hover{border-color:var(--vmid);background:var(--vbg)}
+.opt-btn:active{transform:scale(.98)}
+.opt-btn .opt-icon{font-size:17px;flex-shrink:0}
+.opt-btn .opt-text{flex:1;line-height:1.3}
+.opt-btn .opt-arrow{color:var(--gm);font-size:14px;flex-shrink:0}
+
+/* Botón WhatsApp */
+.wa-btn{
+  width:100%;padding:13px 16px;
+  background:var(--wa);border:none;border-radius:10px;
+  font-size:14px;font-weight:600;font-family:var(--f);color:#fff;
+  cursor:pointer;text-align:center;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:background .15s,transform .1s;
+  -webkit-tap-highlight-color:transparent;
+}
+.wa-btn:hover{background:var(--wa-dark)}
+.wa-btn:active{transform:scale(.98)}
+.wa-btn svg{width:20px;height:20px;fill:#fff;flex-shrink:0}
+
+/* Botón volver */
+.back-btn{
+  background:none;border:1px solid var(--gb);border-radius:8px;
+  padding:8px 14px;font-size:12px;color:var(--gm);
+  cursor:pointer;font-family:var(--f);
+  transition:background .15s;align-self:flex-start;
+  -webkit-tap-highlight-color:transparent;
+}
+.back-btn:hover{background:var(--gl)}
+
+/* Botón reiniciar */
+.restart-btn{
+  background:none;border:none;
+  font-size:12px;color:var(--gm);
+  cursor:pointer;font-family:var(--f);text-decoration:underline;
+  padding:4px 0;
+  -webkit-tap-highlight-color:transparent;
+}
+
+/* ── FOOTER ── */
+.chat-footer{
+  padding:10px 14px 14px;
+  border-top:1px solid var(--gb);
+  background:var(--blanco);
+}
+.footer-note{
+  font-size:11px;color:var(--gm);text-align:center;margin-top:8px;line-height:1.5;
+}
+.footer-note a{color:var(--az);text-decoration:none}
+
+/* ── SUCURSAL CARDS ── */
+.suc-cards{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.suc-card{background:var(--blanco);border:1px solid var(--gb);border-radius:10px;padding:11px 13px;display:flex;align-items:center;gap:10px}
+.suc-info{flex:1}
+.suc-name{font-size:13px;font-weight:600;color:var(--negro);margin-bottom:2px}
+.suc-addr{font-size:11px;color:var(--gm);margin-bottom:2px}
+.suc-hrs{font-size:11px;color:var(--az)}
+.suc-wa{width:38px;height:38px;background:#25D366;border:none;border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .15s;-webkit-tap-highlight-color:transparent}
+.suc-wa:hover{background:#1fa855}
+.suc-wa svg{width:20px;height:20px;fill:#fff}
+
+/* ── CALENDARIO DE GUARDIAS ── */
+.cal-wrap{margin-top:8px;display:flex;flex-direction:column;gap:12px}
+.cal-suc-title{font-size:13px;font-weight:600;color:var(--negro);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.cal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.cal-month{background:var(--gl);border:1px solid var(--gb);border-radius:8px;padding:8px 10px}
+.cal-month-name{font-size:10px;font-weight:600;color:var(--gm);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.cal-days{display:flex;flex-wrap:wrap;gap:4px}
+.cal-day{width:26px;height:26px;border-radius:50%;background:var(--v);color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.cal-empty{font-size:11px;color:var(--gb);font-style:italic}
+.cal-divider{height:1px;background:var(--gb);margin:4px 0}
+</style>
+</head>
+<body>
+
+<div class="chat-wrap">
+
+  <!-- HEADER -->
+  <div class="chat-header">
+    <div class="chat-avatar">
+      <svg viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+    </div>
+    <div class="chat-header-text">
+      <h1>Asistente FullFarma</h1>
+      <p><span class="status-dot"></span> En línea · Te respondo al instante</p>
+    </div>
+  </div>
+
+  <!-- MENSAJES -->
+  <div class="chat-body" id="chatBody"></div>
+
+  <!-- OPCIONES / BOTONES -->
+  <div class="options-wrap" id="optionsWrap"></div>
+
+  <!-- FOOTER -->
+  <div class="chat-footer">
+    <div class="footer-note">
+      Farmacia Nueva Fulchi · Boulogne Sur Mer 1301, Longchamps · <a href="tel:01159631267">011 5963-1267</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ══ DATOS DE LA FARMACIA ═══════════════════════════════════════════════════
+const WA_NUM  = '5491159631267'; // formato internacional sin +
+const WA_BASE = `https://wa.me/${WA_NUM}`;
+const TEL     = '01159631267';
+
+// ══ ÁRBOL DE DECISIONES ════════════════════════════════════════════════════
+const TREE = {
+
+  inicio: {
+    msg: `¡Hola! 👋 Soy el asistente de <strong>Farmacia Nueva Fulchi</strong>.\n\n¿En qué puedo ayudarte hoy?`,
+    opts: [
+      { icon:'🕐', text:'Horarios y sucursales',      next:'horarios'      },
+      { icon:'🏥', text:'Obras sociales y PAMI',       next:'obras_sociales' },
+      { icon:'⚗️', text:'Preparados magistrales',      next:'magistrales'   },
+      { icon:'💉', text:'Vacunación',                  next:'vacunacion'    },
+      { icon:'🛵', text:'Delivery y envíos',           next:'delivery'      },
+      { icon:'💊', text:'Medicamentos con receta',     next:'recetas'       },
+      { icon:'🩸', text:'Glucemia y presión arterial', next:'servicios_salud'},
+      { icon:'💬', text:'Hablar con un farmacéutico',  next:'whatsapp_directo'},
+    ]
+  },
+
+  // ── HORARIOS ──────────────────────────────────────────────────────────────
+  horarios: {
+    msg: `🕐 <strong>Horarios y sucursales</strong>\n\n¿Sobre cuál sucursal querés información?`,
+    opts: [
+      { icon:'📍', text:'Ver todas las sucursales',    next:'sucursales'        },
+      { icon:'🗓️', text:'Guardias dominicales',         next:'guardias'          },
+      { icon:'🗺️', text:'Ver en Google Maps',          next:'maps_selector'     },
+      { icon:'💬', text:'Consultar por WhatsApp',       next:'whatsapp_directo'  },
+      { icon:'🏠', text:'Volver al inicio',             next:'inicio'            },
+    ]
+  },
+
+  sucursales: {
+    type: 'sucursales',
+    msg: `📍 <strong>Nuestras sucursales</strong>\n\nTocá el WhatsApp de la sucursal que querés contactar.`,
+    opts: [
+      { icon:'🗓️', text:'Guardias dominicales',       next:'guardias'    },
+      { icon:'🗺️', text:'Ver en Google Maps',         next:'maps_selector'     },
+      { icon:'🏠', text:'Volver al inicio',           next:'inicio'      },
+    ]
+  },
+
+  guardias: {
+    type: 'guardias',
+    msg: `🗓️ <strong>Guardias dominicales 2025</strong>\n\nHorario: <strong>9:00–13:00 hs</strong>`,
+    opts: [
+      { icon:'📍', text:'Ver todas las sucursales',  next:'sucursales'  },
+      { icon:'🏠', text:'Volver al inicio',          next:'inicio'      },
+    ]
+  },
+
+  // ── OBRAS SOCIALES ────────────────────────────────────────────────────────
+  obras_sociales: {
+    msg: `🏥 <strong>Obras sociales y prepagas</strong>\n\nTrabajamos con las principales obras sociales y prepagas, incluyendo <strong>PAMI</strong>.\n\nPara confirmar si trabajamos con tu cobertura específica o consultar descuentos, escribinos por WhatsApp con el nombre de tu obra social.`,
+    opts: [
+      { icon:'💬', text:'Consultar mi cobertura por WhatsApp', action:'wa_obras'    },
+      { icon:'💊', text:'Preguntar por un medicamento puntual', next:'stock'        },
+      { icon:'🏠', text:'Volver al inicio',                    next:'inicio'       },
+    ]
+  },
+
+  // ── MAGISTRALES ───────────────────────────────────────────────────────────
+  magistrales: {
+    msg: `⚗️ <strong>Preparados magistrales</strong>\n\nContamos con <strong>laboratorio propio</strong> en el local. Elaboramos fórmulas magistrales a pedido bajo prescripción médica.\n\n📋 Más de <strong>38 preparados disponibles</strong>: cremas, cápsulas, gotas, pomadas, soluciones y más.\n\n¿Qué necesitás?`,
+    opts: [
+      { icon:'📋', text:'Ver catálogo completo (Vademecum 2025)', action:'catalogo'       },
+      { icon:'📝', text:'Hacer un pedido de preparado',           action:'wa_magistral'   },
+      { icon:'❓', text:'Consultar precio o disponibilidad',      action:'wa_magistral'   },
+      { icon:'🏠', text:'Volver al inicio',                       next:'inicio'           },
+    ]
+  },
+
+  // ── VACUNACIÓN ────────────────────────────────────────────────────────────
+  vacunacion: {
+    msg: `💉 <strong>Vacunación</strong>\n\nAplicamos vacunas para adultos y niños en el local.\n\n¿Necesitás información sobre alguna vacuna en particular?`,
+    opts: [
+      { icon:'🤧', text:'Vacuna antigripal',         next:'vacuna_gripe'    },
+      { icon:'👶', text:'Vacunas para bebés/niños',  action:'wa_vacuna'     },
+      { icon:'🌍', text:'Vacunas de viaje',          action:'wa_vacuna'     },
+      { icon:'💉', text:'Otra vacuna',               action:'wa_vacuna'     },
+      { icon:'🏠', text:'Volver al inicio',          next:'inicio'          },
+    ]
+  },
+
+  vacuna_gripe: {
+    msg: `🤧 <strong>Vacuna antigripal</strong>\n\nDisponible en stock durante la temporada (mayo–agosto).\n\n✅ Sin turno previo en stock habitual\n✅ Para adultos y niños mayores de 6 meses\n⏱ El procedimiento demora 5–10 minutos\n\nPara confirmar disponibilidad actual, consultanos.`,
+    opts: [
+      { icon:'💬', text:'Confirmar disponibilidad por WhatsApp', action:'wa_vacuna' },
+      { icon:'🔙', text:'Otras vacunas',                        next:'vacunacion'  },
+      { icon:'🏠', text:'Volver al inicio',                     next:'inicio'      },
+    ]
+  },
+
+  // ── DELIVERY ──────────────────────────────────────────────────────────────
+  delivery: {
+    msg: `🛵 <strong>Delivery y envíos</strong>\n\n¿Qué querés enviar?`,
+    opts: [
+      { icon:'🧴', text:'Perfumería o medicamentos de venta libre', next:'delivery_moto'   },
+      { icon:'💊', text:'Medicamentos con receta',                  next:'delivery_receta' },
+      { icon:'🛒', text:'Compra por la tienda online',              next:'delivery_online' },
+      { icon:'🏠', text:'Volver al inicio',                         next:'inicio'          },
+    ]
+  },
+
+  delivery_moto: {
+    msg: `🛵 <strong>Envío por Uber Moto</strong>\n\nEnviamos <strong>perfumería y medicamentos de venta libre</strong> a domicilio por Uber Moto.\n\n📍 Zona: Capital Federal y Provincia de Buenos Aires (principalmente zona sur)\n\n<strong>¿Cómo funciona?</strong>\n1. Consultanos por WhatsApp qué producto querés\n2. Te mandamos el link de pago o datos para transferencia\n3. Confirmás el pago\n4. Gestionamos el envío — el costo del Uber Moto es a cargo del comprador`,
+    opts: [
+      { icon:'💬', text:'Consultar por WhatsApp',    action:'wa_delivery_moto' },
+      { icon:'🔙', text:'Volver a Envíos',           next:'delivery'           },
+      { icon:'🏠', text:'Volver al inicio',          next:'inicio'             },
+    ]
+  },
+
+  delivery_receta: {
+    msg: `💊 <strong>Medicamentos con receta</strong>\n\nLos medicamentos con receta <strong>no se envían a domicilio</strong>. Deben retirarse personalmente en cualquiera de nuestras sucursales presentando la receta médica vigente.\n\n📍 Podés retirar en la sucursal que te quede más cómoda.`,
+    opts: [
+      { icon:'📍', text:'Ver sucursales y horarios',  next:'sucursales'    },
+      { icon:'🏥', text:'Consultar obra social',      next:'obras_sociales' },
+      { icon:'🏠', text:'Volver al inicio',           next:'inicio'        },
+    ]
+  },
+
+  delivery_online: {
+    msg: `🛒 <strong>Tienda online — fullfarma.com.ar</strong>\n\nEn la tienda online podés comprar <strong>perfumería</strong>.\n\n📦 Al finalizar la compra podés elegir:\n• <strong>Envío a domicilio</strong> — consultanos el costo por WhatsApp\n• <strong>Retiro en sucursal</strong> — sin costo adicional\n\n🎁 Primera compra con cupón de descuento`,
+    opts: [
+      { icon:'🛒', text:'Ir a la tienda online',       action:'tienda'          },
+      { icon:'💬', text:'Consultar envío por WhatsApp', action:'wa_delivery_web' },
+      { icon:'🏠', text:'Volver al inicio',            next:'inicio'            },
+    ]
+  },
+
+  // ── RECETAS ───────────────────────────────────────────────────────────────
+  recetas: {
+    msg: `💊 <strong>Medicamentos con receta</strong>\n\n¿Qué necesitás?`,
+    opts: [
+      { icon:'🔍', text:'Consultar stock de un medicamento',   next:'stock'       },
+      { icon:'🏥', text:'Medicamento con cobertura de obra social', next:'obras_sociales'},
+      { icon:'📋', text:'Renovar receta crónica',              action:'wa_receta' },
+      { icon:'💬', text:'Consultar por WhatsApp',              next:'whatsapp_directo'},
+      { icon:'🏠', text:'Volver al inicio',                    next:'inicio'      },
+    ]
+  },
+
+  stock: {
+    msg: `🔍 <strong>Consulta de stock y precios</strong>\n\nEl stock y los precios varían diariamente. Para confirmar la disponibilidad de un medicamento específico, escribinos por WhatsApp con el nombre del producto.\n\n⚡ Te respondemos en minutos durante el horario de atención.`,
+    opts: [
+      { icon:'💬', text:'Consultar disponibilidad por WhatsApp', action:'wa_stock' },
+      { icon:'🛒', text:'Buscar en la tienda online',            action:'tienda'   },
+      { icon:'🏠', text:'Volver al inicio',                      next:'inicio'     },
+    ]
+  },
+
+  // ── SERVICIOS DE SALUD ────────────────────────────────────────────────────
+  servicios_salud: {
+    msg: `🩺 <strong>Servicios de salud en el local</strong>\n\nOfrecemos los siguientes servicios sin turno:\n\n🩸 <strong>Control de glucemia</strong> — medición rápida en el momento\n💙 <strong>Control de presión arterial</strong> — gratuito para todos\n\n¿Sobre cuál querés información?`,
+    opts: [
+      { icon:'🩸', text:'Control de glucemia',         next:'glucemia'        },
+      { icon:'💙', text:'Control de presión arterial', next:'presion'         },
+      { icon:'💬', text:'Otra consulta médica',        next:'whatsapp_directo'},
+      { icon:'🏠', text:'Volver al inicio',            next:'inicio'          },
+    ]
+  },
+
+  glucemia: {
+    msg: `🩸 <strong>Control de glucemia</strong>\n\n✅ Sin turno previo\n✅ Resultado inmediato\n✅ Indicado para pacientes diabéticos y control preventivo\n⏱ Demora 2–3 minutos\n\nPresentarse en el local durante el horario de atención.\n<strong>Lunes a sábado: 8:30 a 20:30 hs</strong>`,
+    opts: [
+      { icon:'💬', text:'Consultar más por WhatsApp', action:'wa_salud'  },
+      { icon:'🔙', text:'Otros servicios de salud',  next:'servicios_salud'},
+      { icon:'🏠', text:'Volver al inicio',          next:'inicio'       },
+    ]
+  },
+
+  presion: {
+    msg: `💙 <strong>Control de presión arterial</strong>\n\n✅ Gratuito para todos\n✅ Sin turno previo\n✅ Para pacientes hipertensos y control preventivo\n⏱ Demora 5 minutos\n\nPresentarse en el local durante el horario de atención.\n<strong>Lunes a sábado: 8:30 a 20:30 hs</strong>`,
+    opts: [
+      { icon:'💬', text:'Consultar más por WhatsApp', action:'wa_salud'  },
+      { icon:'🔙', text:'Otros servicios de salud',  next:'servicios_salud'},
+      { icon:'🏠', text:'Volver al inicio',          next:'inicio'       },
+    ]
+  },
+
+  // ── WHATSAPP DIRECTO ──────────────────────────────────────────────────────
+  whatsapp_directo: {
+    msg: `💬 <strong>Hablar con un farmacéutico</strong>\n\nNuestro equipo te responde por WhatsApp durante el horario de atención.\n\n🕐 Lunes a sábado: 8:30 a 20:30 hs\n⚡ Tiempo de respuesta: minutos`,
+    opts: [
+      { icon:'💬', text:'Abrir WhatsApp ahora',      action:'wa_general'  },
+      { icon:'🏠', text:'Volver al inicio',          next:'inicio'        },
+    ]
+  },
+
+  // ── MAPS ──────────────────────────────────────────────────────────────────
+  maps_selector: {
+    msg: `🗺️ <strong>¿A qué sucursal querés llegar?</strong>`,
+    opts: [
+      { icon:'📍', text:'Nueva Fulchi — Longchamps',     action:'maps_central'   },
+      { icon:'📍', text:'Fullfarma Berlín — Longchamps', action:'maps_berlin'    },
+      { icon:'📍', text:'Fullfarma Glew — Glew',         action:'maps_glew'      },
+      { icon:'📍', text:'Fullfarma Espora — Glew',       action:'maps_espora'    },
+      { icon:'📍', text:'Fullfarma Rivadavia',           action:'maps_rivadavia' },
+      { icon:'🏠', text:'Volver al inicio',              next:'inicio'           },
+    ]
+  },
+
+
+};
+
+// ══ ACCIONES (links externos) ═══════════════════════════════════════════════
+const ACTIONS = {
+  maps:             'https://maps.google.com/?q=Farmacia+Nueva+Fulchi+Longchamps',
+  maps_central:     'https://maps.google.com/?q=Boulogne+Sur+Mer+1301+Longchamps+Buenos+Aires',
+  maps_berlin:      'https://maps.google.com/?q=Av+Berlín+2+esq+Espora+Longchamps+Buenos+Aires',
+  maps_glew:        'https://maps.google.com/?q=Av+Hipolito+Irigoyen+20906+Glew+Buenos+Aires',
+  maps_espora:      'https://maps.google.com/?q=Miguel+Cane+240+Glew+Buenos+Aires',
+  maps_rivadavia:   'https://maps.google.com/?q=25+de+Mayo+895+Ministro+Rivadavia+Buenos+Aires',
+  tienda:           'https://www.fullfarma.com.ar',
+  catalogo:         'https://rappend1.github.io/fulchi-lab/C3_Preparados_Magistrales.html',
+  wa_general:       `${WA_BASE}?text=${encodeURIComponent('Hola, tengo una consulta para la farmacia.')}`,
+  wa_obras:         `${WA_BASE}?text=${encodeURIComponent('Hola, quiero consultar si trabajan con mi obra social:')}`,
+  wa_delivery_moto: `${WA_BASE}?text=${encodeURIComponent('Hola, quiero hacer un pedido con envío por Uber Moto. Producto:')}`,
+  wa_delivery_web:  `${WA_BASE}?text=${encodeURIComponent('Hola, hice una compra en la tienda online y quiero consultar el costo del envío.')}`,
+  wa_magistral: `${WA_BASE}?text=${encodeURIComponent('Hola, quiero consultar sobre preparados magistrales:')}`,
+  wa_vacuna:    `${WA_BASE}?text=${encodeURIComponent('Hola, quiero consultar sobre vacunación:')}`,
+  wa_delivery:  `${WA_BASE}?text=${encodeURIComponent('Hola, quiero consultar sobre envíos a domicilio.')}`,
+  wa_receta:    `${WA_BASE}?text=${encodeURIComponent('Hola, necesito renovar una receta crónica.')}`,
+  wa_stock:     `${WA_BASE}?text=${encodeURIComponent('Hola, quiero consultar la disponibilidad de un medicamento:')}`,
+  wa_salud:     `${WA_BASE}?text=${encodeURIComponent('Hola, tengo una consulta sobre servicios de salud en el local.')}`,
+};
+
+// ══ ESTADO ══════════════════════════════════════════════════════════════════
+let historial = [];
+
+// ══ DOM ═════════════════════════════════════════════════════════════════════
+const chatBody   = document.getElementById('chatBody');
+const optWrap    = document.getElementById('optionsWrap');
+
+// ══ RENDER MENSAJE ══════════════════════════════════════════════════════════
+function addBotMsg(text, delay=0){
+  return new Promise(resolve => {
+    // Typing indicator
+    const typing = document.createElement('div');
+    typing.className='typing';
+    typing.innerHTML=`
+      <div class="bot-icon"><svg viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+      <div class="typing-bubble"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+    chatBody.appendChild(typing);
+    scrollBottom();
+
+    setTimeout(()=>{
+      typing.remove();
+      const wrap = document.createElement('div');
+      wrap.className='msg-bot';
+      wrap.innerHTML=`
+        <div class="bot-icon"><svg viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+        <div class="bubble-bot">${text.replace(/\n/g,'<br>')}</div>`;
+      chatBody.appendChild(wrap);
+      scrollBottom();
+      resolve();
+    }, delay || 600);
+  });
+}
+
+function addUserMsg(text){
+  const el = document.createElement('div');
+  el.className='msg-user';
+  el.textContent=text;
+  chatBody.appendChild(el);
+  scrollBottom();
+}
+
+// ══ RENDER OPCIONES ══════════════════════════════════════════════════════════
+function renderOpts(nodeId){
+  const node = TREE[nodeId];
+  if(!node) return;
+  optWrap.innerHTML='';
+
+  node.opts.forEach(opt=>{
+    if(opt.action){
+      // Acciones externas (links)
+      if(opt.action.startsWith('wa_') || opt.action==='wa_general'){
+        // Botón WhatsApp
+        const btn = document.createElement('button');
+        btn.className='wa-btn';
+        btn.innerHTML=`
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.555 4.116 1.527 5.845L.057 23.486c-.094.32.007.664.259.894.181.163.415.248.654.248.078 0 .157-.01.234-.03l5.86-1.528A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.938 0-3.77-.497-5.363-1.373l-.38-.213-3.938 1.027 1.004-3.813-.228-.374A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+          ${opt.text}`;
+        btn.onclick=()=>{
+          addUserMsg(opt.text);
+          optWrap.innerHTML='';
+          setTimeout(()=>window.open(ACTIONS[opt.action],'_blank'),400);
+          setTimeout(()=>{ renderOpts('inicio'); }, 1200);
+        };
+        optWrap.appendChild(btn);
+      } else {
+        // Link normal (Maps, tienda, etc.)
+        const btn = document.createElement('button');
+        btn.className='opt-btn';
+        btn.innerHTML=`<span class="opt-icon">${opt.icon}</span><span class="opt-text">${opt.text}</span><span class="opt-arrow">↗</span>`;
+        btn.onclick=()=>{
+          addUserMsg(opt.text);
+          optWrap.innerHTML='';
+          window.open(ACTIONS[opt.action],'_blank');
+          setTimeout(()=>{ renderOpts('inicio'); }, 800);
+        };
+        optWrap.appendChild(btn);
+      }
+    } else if(opt.next){
+      const btn = document.createElement('button');
+      btn.className='opt-btn';
+      btn.innerHTML=`<span class="opt-icon">${opt.icon}</span><span class="opt-text">${opt.text}</span><span class="opt-arrow">›</span>`;
+      btn.onclick=()=>navigate(opt.text, opt.next);
+      optWrap.appendChild(btn);
+    }
+  });
+
+  // Botón reiniciar (si no está en inicio)
+  if(nodeId !== 'inicio' && historial.length > 0){
+    const restart = document.createElement('button');
+    restart.className='restart-btn';
+    restart.textContent='↩ Volver al inicio';
+    restart.onclick=()=>{
+      historial=[];
+      addUserMsg('Volver al inicio');
+      goTo('inicio');
+    };
+    optWrap.appendChild(restart);
+  }
+}
+
+// ══ NAVEGACIÓN ══════════════════════════════════════════════════════════════
+// ══ RENDER SUCURSALES ═══════════════════════════════════════════════════════
+function renderSucursales(container){
+  const SUCS = [
+    { name:'Nueva Fulchi (Central)', addr:'Boulogne Sur Mer 1301 – Longchamps', hrs:'Lun–Sáb 8:30–13:00 y 16:30–20:00', wa:'5491161724695' },
+    { name:'Fullfarma Berlín',        addr:'Av. Berlín 2 esq. Espora – Longchamps',        hrs:'Lun–Sáb 8:30–20:30',                    wa:'5491159631266' },
+    { name:'Fullfarma Glew',          addr:'Av. H. Irigoyen 20906 esq. Caseros – Glew',    hrs:'Lun–Sáb 8:30–21:00',                    wa:'5491162033013' },
+    { name:'Fullfarma Espora',        addr:'Miguel Cané 240 – Glew',                        hrs:'Lun–Sáb 9:00–13:00 y 16:00–20:00 · Dom 9:00–13:00', wa:'5491123867660' },
+    { name:'Fullfarma Rivadavia',     addr:'25 de Mayo 895 – Ministro Rivadavia',           hrs:'Consultar horario',                     wa:'5491148896474' },
+  ];
+  const WA_SVG = `<svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.555 4.116 1.527 5.845L.057 23.486c-.094.32.007.664.259.894.181.163.415.248.654.248.078 0 .157-.01.234-.03l5.86-1.528A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.938 0-3.77-.497-5.363-1.373l-.38-.213-3.938 1.027 1.004-3.813-.228-.374A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>`;
+  const cards = document.createElement('div');
+  cards.className='suc-cards';
+  SUCS.forEach(s=>{
+    const c=document.createElement('div'); c.className='suc-card';
+    const btn=document.createElement('button'); btn.className='suc-wa'; btn.title='WhatsApp';
+    btn.innerHTML=WA_SVG; btn.onclick=()=>window.open('https://wa.me/'+s.wa,'_blank');
+    c.innerHTML=`<div class="suc-info"><div class="suc-name">${s.name}</div><div class="suc-addr">${s.addr}</div><div class="suc-hrs">${s.hrs}</div></div>`;
+    c.appendChild(btn);
+    cards.appendChild(c);
+  });
+  container.appendChild(cards);
+}
+
+// ══ RENDER GUARDIAS ══════════════════════════════════════════════════════════
+function renderGuardias(container){
+  const DATA = [
+    { suc:'Fullfarma Espora', addr:'Miguel Cané 240 – Glew', meses:[
+      { m:'Abril',      dias:[22] },
+      { m:'Mayo',       dias:[4,14,24] },
+      { m:'Junio',      dias:[4,16,28] },
+      { m:'Julio',      dias:[10,22] },
+      { m:'Agosto',     dias:[3,15,27] },
+      { m:'Septiembre', dias:[8,20] },
+      { m:'Octubre',    dias:[2,14,26] },
+      { m:'Noviembre',  dias:[7,19] },
+      { m:'Diciembre',  dias:[1,13] },
+    ]},
+    { suc:'Fullfarma Glew', addr:'Av. H. Irigoyen 20906 – Glew', meses:[
+      { m:'Abril',      dias:[11,23] },
+      { m:'Mayo',       dias:[] },
+      { m:'Junio',      dias:[5,17,29] },
+      { m:'Julio',      dias:[11,23] },
+      { m:'Agosto',     dias:[4,28] },
+      { m:'Septiembre', dias:[9,21] },
+      { m:'Octubre',    dias:[3,15,27] },
+      { m:'Noviembre',  dias:[8,20] },
+      { m:'Diciembre',  dias:[2,14,26] },
+    ]},
+  ];
+  const wrap = document.createElement('div'); wrap.className='cal-wrap';
+  DATA.forEach((suc,si)=>{
+    if(si>0){ const d=document.createElement('div'); d.className='cal-divider'; wrap.appendChild(d); }
+    const title=document.createElement('div'); title.className='cal-suc-title';
+    title.innerHTML=`🏪 ${suc.suc} <span style="font-size:10px;color:var(--gm);font-weight:400">— ${suc.addr}</span>`;
+    wrap.appendChild(title);
+    const grid=document.createElement('div'); grid.className='cal-grid';
+    suc.meses.forEach(mes=>{
+      const box=document.createElement('div'); box.className='cal-month';
+      const name=document.createElement('div'); name.className='cal-month-name'; name.textContent=mes.m;
+      box.appendChild(name);
+      const days=document.createElement('div'); days.className='cal-days';
+      if(mes.dias.length===0){
+        const empty=document.createElement('span'); empty.className='cal-empty'; empty.textContent='Sin guardia';
+        days.appendChild(empty);
+      } else {
+        mes.dias.forEach(d=>{ const el=document.createElement('div'); el.className='cal-day'; el.textContent=d; days.appendChild(el); });
+      }
+      box.appendChild(days); grid.appendChild(box);
+    });
+    wrap.appendChild(grid);
+  });
+  container.appendChild(wrap);
+}
+
+async function goTo(nodeId){
+  const node = TREE[nodeId];
+  if(!node) return;
+  optWrap.innerHTML='';
+  await addBotMsg(node.msg);
+  // Inyectar contenido especial después de la burbuja
+  if(node.type === 'sucursales'){
+    const lastBubble = chatBody.lastElementChild?.querySelector('.bubble-bot');
+    if(lastBubble) renderSucursales(lastBubble);
+  } else if(node.type === 'guardias'){
+    const lastBubble = chatBody.lastElementChild?.querySelector('.bubble-bot');
+    if(lastBubble) renderGuardias(lastBubble);
+  }
+  renderOpts(nodeId);
+}
+
+function navigate(label, nodeId){
+  historial.push(nodeId);
+  addUserMsg(label);
+  optWrap.innerHTML='';
+  goTo(nodeId);
+}
+
+function scrollBottom(){
+  setTimeout(()=>chatBody.scrollTop=chatBody.scrollHeight, 50);
+}
+
+// ══ INICIO ══════════════════════════════════════════════════════════════════
+window.onload=()=>{
+  addBotMsg('¡Hola! 👋 Soy el asistente de <strong>Farmacia Nueva Fulchi</strong>.\n\n¿En qué puedo ayudarte hoy?', 400)
+    .then(()=>renderOpts('inicio'));
+};
+</script>
+</body>
+</html>
