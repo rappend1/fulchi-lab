@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Servicios de Salud — Farmacia Nueva Fulchi</title>
+<meta name="description" content="Vacunación, control de glucemia, presión arterial y más servicios de salud en Farmacia Nueva Fulchi, Longchamps. Sin turno previo.">
+
+<style>
+:root{
+  --v:#27500A;--vbg:#EAF3DE;--vmid:#639922;--vb:#C0DD97;
+  --az:#0C447C;--abg:#E6F1FB;--ab:#85B7EB;
+  --am:#633806;--ambg:#FAEEDA;--abb:#FAC775;
+  --r:#791F1F;--rbg:#FCEBEB;
+  --gb:#D3D1C7;--gl:#F4F2EB;--gm:#888780;--gt:#444441;
+  --negro:#1a1a1a;--blanco:#ffffff;
+  --wa:#25D366;
+  --f:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f);background:var(--gl);color:var(--gt);line-height:1.6}
+.page{max-width:800px;margin:0 auto;padding:28px 18px 48px}
+
+/* HERO */
+.hero{background:var(--v);color:#fff;border-radius:var(--radius);padding:28px 24px;margin-bottom:28px}
+.hero-badge{font-size:11px;background:rgba(255,255,255,.2);border-radius:20px;padding:3px 10px;display:inline-block;margin-bottom:10px;letter-spacing:.04em}
+.hero h1{font-size:26px;font-weight:700;line-height:1.25;margin-bottom:8px}
+.hero p{font-size:14px;opacity:.88;max-width:520px;line-height:1.6}
+
+/* SECCIONES */
+.section{background:var(--blanco);border-radius:var(--radius);border:1px solid var(--gb);padding:22px 22px;margin-bottom:18px}
+.section-title{font-size:16px;font-weight:600;color:var(--negro);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-title .icon{font-size:20px}
+
+/* SERVICIOS GRID */
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.service-card{background:var(--gl);border:1px solid var(--gb);border-radius:var(--radius);padding:16px 18px}
+.service-card h3{font-size:14px;font-weight:600;color:var(--negro);margin-bottom:5px;display:flex;align-items:center;gap:7px}
+.service-card p{font-size:13px;color:var(--gm);line-height:1.5}
+.service-card .tag{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;margin-top:8px}
+.tag-libre{background:var(--vbg);color:var(--v)}
+.tag-turno{background:var(--abg);color:var(--az)}
+
+/* INFO ROWS */
+.info-row{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--gl)}
+.info-row:last-child{border-bottom:none}
+.info-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.info-label{font-size:12px;color:var(--gm);margin-bottom:2px;font-weight:500}
+.info-val{font-size:14px;color:var(--negro);line-height:1.5}
+.info-val strong{color:var(--v)}
+
+/* HORARIOS TABLE */
+.horario-table{width:100%;border-collapse:collapse;font-size:14px}
+.horario-table tr{border-bottom:1px solid var(--gl)}
+.horario-table tr:last-child{border-bottom:none}
+.horario-table td{padding:9px 4px}
+.horario-table td:first-child{color:var(--gm);width:140px;font-weight:500}
+.horario-table td:last-child{color:var(--negro);font-weight:600}
+.horario-badge{display:inline-block;background:var(--vbg);color:var(--v);font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;margin-left:8px}
+
+/* LISTA */
+.list-items{display:flex;flex-direction:column;gap:8px}
+.list-item{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--gt)}
+.list-item .check{color:var(--vmid);font-size:16px;flex-shrink:0;margin-top:1px}
+
+/* HIGHLIGHT BOX */
+.highlight{background:var(--vbg);border:1px solid var(--vb);border-radius:var(--radius);padding:16px 18px;margin-bottom:18px}
+.highlight p{font-size:14px;color:var(--v);line-height:1.6}
+.highlight strong{color:var(--negro)}
+
+.alert-box{background:var(--ambg);border:1px solid var(--abb);border-radius:var(--radius);padding:14px 16px;margin-bottom:18px;font-size:13px;color:var(--am);line-height:1.6}
+
+/* BOTONES */
+.btn-wa{
+  display:inline-flex;align-items:center;gap:9px;
+  background:var(--wa);color:#fff;border:none;border-radius:9px;
+  padding:12px 20px;font-size:14px;font-weight:600;font-family:var(--f);
+  cursor:pointer;text-decoration:none;
+  transition:background .15s;
+}
+.btn-wa:hover{background:#1fa855}
+.btn-wa svg{width:18px;height:18px;fill:#fff}
+.btn-tel{
+  display:inline-flex;align-items:center;gap:9px;
+  background:var(--az);color:#fff;border:none;border-radius:9px;
+  padding:12px 20px;font-size:14px;font-weight:600;font-family:var(--f);
+  cursor:pointer;text-decoration:none;
+  transition:background .15s;
+}
+.btn-tel:hover{background:#0a3a6b}
+.btn-map{
+  display:inline-flex;align-items:center;gap:9px;
+  background:var(--gl);color:var(--az);border:1px solid var(--ab);border-radius:9px;
+  padding:12px 20px;font-size:14px;font-weight:600;font-family:var(--f);
+  cursor:pointer;text-decoration:none;
+  transition:background .15s;
+}
+.btn-map:hover{background:var(--abg)}
+.btns-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+
+/* VADEMECUM GRID */
+.vade-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.vade-card{background:var(--gl);border:1px solid var(--gb);border-radius:9px;padding:12px 14px}
+.vade-card .vname{font-size:13px;font-weight:600;color:var(--negro);margin-bottom:3px}
+.vade-card .vcap{font-size:11px;color:var(--gm)}
+.vade-cat{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;display:inline-block;margin-top:5px}
+.cat-piel{background:#E8F5E9;color:#2E7D32}
+.cat-anti{background:#E3F2FD;color:#1565C0}
+.cat-dige{background:#FFF3E0;color:#E65100}
+.cat-suple{background:#F3E5F5;color:#6A1B9A}
+.cat-otras{background:var(--gl);color:var(--gm)}
+.cat-cosm{background:#FCE4EC;color:#880E4F}
+
+/* PROCESO STEPS */
+.steps{display:flex;flex-direction:column;gap:0}
+.step{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--gl)}
+.step:last-child{border-bottom:none}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--v);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-body h4{font-size:14px;font-weight:600;color:var(--negro);margin-bottom:3px}
+.step-body p{font-size:13px;color:var(--gm);line-height:1.5}
+
+/* FORM */
+.form-field{margin-bottom:14px}
+.form-field label{display:block;font-size:12px;font-weight:500;color:var(--negro);margin-bottom:4px}
+.form-field input,.form-field select,.form-field textarea{
+  width:100%;padding:10px 12px;border:1px solid var(--gb);border-radius:8px;
+  font-size:14px;font-family:var(--f);color:var(--negro);background:var(--blanco);
+  transition:border-color .15s;-webkit-appearance:none;
+}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{
+  outline:none;border-color:var(--ab);box-shadow:0 0 0 3px rgba(55,138,221,.1);
+}
+.form-field textarea{min-height:90px;resize:vertical;line-height:1.5}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn-submit{
+  width:100%;padding:12px;border:none;border-radius:9px;
+  background:var(--v);color:#fff;font-size:14px;font-weight:600;
+  font-family:var(--f);cursor:pointer;transition:background .15s;margin-top:4px;
+}
+.btn-submit:hover{background:#1e3d08}
+.success-msg{display:none;background:var(--vbg);border:1px solid var(--vb);border-radius:9px;padding:14px 16px;font-size:14px;color:var(--v);text-align:center;margin-top:12px}
+
+/* FOOTER INTERNO */
+.page-footer{text-align:center;font-size:12px;color:var(--gm);padding-top:24px;line-height:1.8}
+.page-footer a{color:var(--az);text-decoration:none}
+
+@media(max-width:520px){
+  .hero h1{font-size:21px}
+  .r2{grid-template-columns:1fr}
+  .btns-row{flex-direction:column}
+  .btn-wa,.btn-tel,.btn-map{justify-content:center;text-align:center}
+}
+</style>
+
+</head>
+<body>
+<div class="page">
+
+  <div class="hero">
+    <div class="hero-badge">Servicios de salud</div>
+    <h1>Cuidamos tu salud más allá del mostrador</h1>
+    <p>Ofrecemos servicios profesionales de salud en el local, sin turno previo, atendidos por nuestro equipo farmacéutico.</p>
+  </div>
+
+  <div class="highlight">
+    <p>✅ <strong>Sin turno previo</strong> para la mayoría de los servicios · Lunes a sábado 8:30–20:30 hs · Local en Boulogne Sur Mer 1301, Longchamps</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="icon">🩺</span>Servicios disponibles</div>
+    <div class="services-grid">
+
+      <div class="service-card">
+        <h3>💉 Vacunación</h3>
+        <p>Aplicación de vacunas para adultos y niños. Antigripal, neumococo, hepatitis y más. Consultar disponibilidad de cada vacuna.</p>
+        <span class="tag tag-turno">Consultar disponibilidad</span>
+      </div>
+
+      <div class="service-card">
+        <h3>🩸 Control de glucemia</h3>
+        <p>Medición de glucosa en sangre. Resultado inmediato. Indicado para pacientes diabéticos y control preventivo.</p>
+        <span class="tag tag-libre">Sin turno · 2–3 min</span>
+      </div>
+
+      <div class="service-card">
+        <h3>💙 Control de presión arterial</h3>
+        <p>Toma de tensión arterial gratuita para pacientes y público en general. Ideal para hipertensos y control de rutina.</p>
+        <span class="tag tag-libre">Sin turno · Gratuito</span>
+      </div>
+
+      <div class="service-card">
+        <h3>⚗️ Preparados magistrales</h3>
+        <p>Elaboración de fórmulas magistrales a pedido bajo prescripción médica. Laboratorio propio en el local.</p>
+        <span class="tag tag-turno">Ver catálogo completo</span>
+      </div>
+
+      <div class="service-card">
+        <h3>🏥 Obras sociales y PAMI</h3>
+        <p>Atendemos con las principales obras sociales y prepagas. Asesoramiento personalizado en cobertura y descuentos.</p>
+        <span class="tag tag-libre">Consultar cobertura</span>
+      </div>
+
+      <div class="service-card">
+        <h3>💊 Asesoramiento farmacéutico</h3>
+        <p>Consultas sobre medicamentos, interacciones, dosis y cuidados. Atención profesional y confidencial.</p>
+        <span class="tag tag-libre">Sin turno · Gratuito</span>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="icon">📋</span>¿Qué necesitás traer?</div>
+    <div class="list-items">
+      <div class="list-item"><span class="check">✓</span><span>Para <strong>vacunación</strong>: carnet de vacunación y, si es con cobertura, DNI y credencial de obra social</span></div>
+      <div class="list-item"><span class="check">✓</span><span>Para <strong>control de glucemia</strong>: no es necesario ayuno para control casual. Para diagnóstico, consultar con tu médico</span></div>
+      <div class="list-item"><span class="check">✓</span><span>Para <strong>presión arterial</strong>: no se requiere nada. Presentarse en el local</span></div>
+      <div class="list-item"><span class="check">✓</span><span>Para <strong>preparados magistrales</strong>: receta médica vigente</span></div>
+      <div class="list-item"><span class="check">✓</span><span>Para <strong>medicamentos con obra social</strong>: receta médica + credencial de obra social + DNI</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="icon">🕐</span>Horario de atención</div>
+    <table class="horario-table">
+      <tr><td>Lunes a viernes</td><td>8:30 a 20:30 hs <span class="horario-badge">Abierto hoy</span></td></tr>
+      <tr><td>Sábados</td><td>8:30 a 20:30 hs</td></tr>
+      <tr><td>Domingos</td><td>Guardia rotativa — consultar disponibilidad</td></tr>
+    </table>
+    <div class="btns-row">
+      <a href="https://wa.me/5491159631267" target="_blank" class="btn-wa"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.555 4.116 1.527 5.845L.057 23.486c-.094.32.007.664.259.894.181.163.415.248.654.248.078 0 .157-.01.234-.03l5.86-1.528A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.938 0-3.77-.497-5.363-1.373l-.38-.213-3.938 1.027 1.004-3.813-.228-.374A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>Consultar por WhatsApp</a>
+      <a href="tel:01159631267" class="btn-tel">📞 011 5963-1267</a>
+    </div>
+  </div>
+
+  <div class="page-footer">
+  <strong>Farmacia Nueva Fulchi</strong> · Boulogne Sur Mer 1301, Longchamps (B1854)<br>
+  Lunes a sábado 8:30–20:30 hs · 011 5963-1267 · <a href="https://www.fullfarma.com.ar">fullfarma.com.ar</a>
+</div>
+</div>
+</body>
+</html>
