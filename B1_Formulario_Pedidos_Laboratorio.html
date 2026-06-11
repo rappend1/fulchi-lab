@@ -656,20 +656,39 @@ function prepInput(){
   toggleCamposNuevo(false);
   hidePrepCard();
   if(v.length<1){document.getElementById('prepSug').style.display='none';return;}
-  const matches=VADE.filter(p=>p.n.toLowerCase().includes(v)||p.cat.toLowerCase().includes(v)||p.acc.toLowerCase().includes(v));
-  renderPrepSug(matches, v);
+  renderPrepSug(v);
 }
-function prepFocus(){const v=g('preparado').toLowerCase().trim();if(v.length>=1)renderPrepSug(VADE.filter(p=>p.n.toLowerCase().includes(v)||p.cat.toLowerCase().includes(v)),v);}
+function prepFocus(){const v=g('preparado').toLowerCase().trim();if(v.length>=1)renderPrepSug(v);}
 function prepBlur(){setTimeout(()=>{document.getElementById('prepSug').style.display='none';},200);}
 
-function renderPrepSug(items, typed){
+function scoreMatch(p, v){
+  const n=p.n.toLowerCase();
+  if(n.startsWith(v)) return 10;
+  const words=n.split(/[\s\+\/\-]+/);
+  if(words.some(w=>w.startsWith(v))) return 8;
+  if(n.includes(v)) return 6;
+  if((p.cat||'').toLowerCase().includes(v)) return 3;
+  if((p.acc||'').toLowerCase().includes(v)) return 2;
+  if((p.comp||'').toLowerCase().includes(v)) return 1;
+  return 0;
+}
+
+function renderPrepSug(typed){
+  const v=typed.toLowerCase().trim();
   const sug=document.getElementById('prepSug');sug.innerHTML='';
-  // Resultados del Vademecum primero
-  if(items.length){
+
+  const scored=VADE
+    .map(p=>({p, score:scoreMatch(p,v)}))
+    .filter(x=>x.score>0)
+    .sort((a,b)=>b.score-a.score || a.p.n.localeCompare(b.p.n,'es'));
+
+  if(scored.length){
     const ch=document.createElement('div');ch.className='ac-cat';ch.textContent='En el Vademecum';sug.appendChild(ch);
-    items.forEach(p=>{
+    scored.forEach(({p})=>{
       const it=document.createElement('div');it.className='ac-item';
-      it.innerHTML=`<strong style="font-size:13px">${p.n}</strong><br><span style="font-size:11px;color:var(--gm)">${p.acc||''} · ${p.pres||''}</span>`;
+      const re=new RegExp('('+v.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+      const nameHL=p.n.replace(re,'<mark style="background:#FFF176;border-radius:2px;padding:0 1px">$1</mark>');
+      it.innerHTML=`<strong style="font-size:13px">${nameHL}</strong><br><span style="font-size:11px;color:var(--gm)">${p.acc||''} · ${p.pres||''}</span>`;
       it.onmousedown=()=>{
         document.getElementById('preparado').value=p.n;
         sug.style.display='none';
@@ -680,8 +699,8 @@ function renderPrepSug(items, typed){
       sug.appendChild(it);
     });
   }
-  // Siempre al final: opción de crear nuevo
-  if(typed && typed.length>1){
+
+  if(typed.length>1){
     const sep=document.createElement('div');sep.className='ac-cat';sep.textContent='No está en el Vademecum';sug.appendChild(sep);
     const it=document.createElement('div');it.className='ac-item';
     it.style.cssText='color:var(--azul);font-weight:500;display:flex;align-items:center;gap:8px';
