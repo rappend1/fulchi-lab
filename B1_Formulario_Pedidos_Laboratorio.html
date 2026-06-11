@@ -153,6 +153,25 @@ textarea{min-height:72px;resize:vertical;line-height:1.5}
 .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
 .bv{background:var(--vbg);color:var(--verde)}.ba{background:var(--ambg);color:var(--am)}.br{background:var(--rbg);color:var(--rojo)}
 
+/* ── modal codigo ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:flex-end;justify-content:center}
+.modal-bg.open{display:flex}
+.modal-box{background:var(--blanco);border-radius:16px 16px 0 0;padding:20px 16px 32px;width:100%;max-width:480px;animation:slideUp .2s ease}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-title{font-size:15px;font-weight:700;color:var(--negro);margin-bottom:4px;text-align:center}
+.modal-sub{font-size:12px;color:var(--gm);text-align:center;margin-bottom:16px}
+.modal-dots{display:flex;gap:10px;justify-content:center;margin-bottom:16px}
+.modal-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--gb);background:var(--blanco);transition:all .15s}
+.modal-dot.filled{background:var(--azul);border-color:var(--azul)}
+.modal-dot.wrong{background:var(--rojo);border-color:var(--rojo)}
+.modal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.modal-btn{padding:15px 0;border:1px solid var(--gb);border-radius:10px;background:var(--blanco);font-size:18px;font-weight:600;color:var(--negro);cursor:pointer;transition:background .1s,transform .1s;-webkit-tap-highlight-color:transparent}
+.modal-btn:active{background:var(--abg);transform:scale(.95)}
+.modal-btn.del{font-size:14px;color:var(--gm)}
+.modal-btn.empty{visibility:hidden}
+.modal-err{font-size:12px;color:var(--rojo);text-align:center;min-height:16px;margin-top:6px}
+.modal-cancel{width:100%;margin-top:8px;padding:12px;background:var(--gl);border:none;border-radius:10px;font-size:14px;font-weight:500;color:var(--gt);cursor:pointer}
+
 /* vademecum tab */
 .vwrap{padding:14px;max-width:640px;margin:0 auto;padding-bottom:20px}
 .vsearch{width:100%;padding:10px 12px;border:1px solid var(--gb);border-radius:8px;font-size:13px;margin-bottom:12px;background:var(--blanco)}
@@ -290,11 +309,16 @@ textarea{min-height:72px;resize:vertical;line-height:1.5}
               <option>Cápsulas (caja)</option>
               <option>Sachets</option>
             </select>
+            <input type="text" id="presentacionNueva" placeholder="Ej: Frasco 100ml, Pote 50g..." style="display:none;margin-top:0">
           </div>
         </div>
 
+        <div class="alert al-b" id="avisoNuevo" style="display:none">
+          <span class="ai">ℹ</span><span>Este preparado no está en el Vademecum. El laboratorio lo evaluará y te confirmará disponibilidad y precio antes de elaborarlo.</span>
+        </div>
+
         <div class="field">
-          <label>Concentración / Variante<span class="hint">Si aplica — Ej: 5%, 100g, 50ml, etc.</span></label>
+          <label id="labelConc">Concentración / Variante<span class="hint">Si aplica — Ej: 5%, 100g, 50ml, etc.</span></label>
           <input type="text" id="concentracion" placeholder="Ej: 5% · 100g · 2 frascos de 60ml">
         </div>
 
@@ -319,9 +343,20 @@ textarea{min-height:72px;resize:vertical;line-height:1.5}
         <div class="field">
           <label>¿Quién retira el pedido?</label>
           <div class="og">
-            <label class="oc" onclick="sr(this,'retira','sucursal')"><input type="radio" name="retira" value="sucursal"><div><div class="ol">Personal de la sucursal</div></div></label>
-            <label class="oc" onclick="sr(this,'retira','cliente')"><input type="radio" name="retira" value="cliente"><div><div class="ol">Cliente externo directamente</div></div></label>
-            <label class="oc" onclick="sr(this,'retira','coordinado')"><input type="radio" name="retira" value="coordinado"><div><div class="ol">A coordinar con el laboratorio</div></div></label>
+            <label class="oc" onclick="sr(this,'retira','sucursal');toggleRetiraFields('sucursal')"><input type="radio" name="retira" value="sucursal"><div><div class="ol">Personal de la sucursal</div></div></label>
+            <label class="oc" onclick="sr(this,'retira','cliente');toggleRetiraFields('cliente')"><input type="radio" name="retira" value="cliente"><div><div class="ol">Cliente externo directamente</div></div></label>
+            <label class="oc" onclick="sr(this,'retira','coordinado');toggleRetiraFields('coordinado')"><input type="radio" name="retira" value="coordinado"><div><div class="ol">A coordinar con el laboratorio</div></div></label>
+          </div>
+        </div>
+
+        <div id="retiraFields" style="display:none">
+          <div class="field">
+            <label>Nombre de quien retira <span class="req">*</span></label>
+            <input type="text" id="retiraNombre" placeholder="Nombre completo">
+          </div>
+          <div class="field">
+            <label>DNI de quien retira <span class="req">*</span><span class="hint">Requerido para la entrega</span></label>
+            <input type="text" id="retiraDNI" placeholder="Ej: 30.456.789" inputmode="numeric">
           </div>
         </div>
 
@@ -397,13 +432,46 @@ textarea{min-height:72px;resize:vertical;line-height:1.5}
   </div>
 </div>
 
+<!-- ── MODAL CÓDIGO DE SEGURIDAD ── -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal-box">
+    <div class="modal-title" id="modalTitle">Código de laboratorio</div>
+    <div class="modal-sub" id="modalSub">Ingresá el código para confirmar</div>
+    <div class="modal-dots" id="modalDots">
+      <div class="modal-dot" id="md0"></div>
+      <div class="modal-dot" id="md1"></div>
+      <div class="modal-dot" id="md2"></div>
+      <div class="modal-dot" id="md3"></div>
+    </div>
+    <div class="modal-grid">
+      <button class="modal-btn" onclick="mPress('1')">1</button>
+      <button class="modal-btn" onclick="mPress('2')">2</button>
+      <button class="modal-btn" onclick="mPress('3')">3</button>
+      <button class="modal-btn" onclick="mPress('4')">4</button>
+      <button class="modal-btn" onclick="mPress('5')">5</button>
+      <button class="modal-btn" onclick="mPress('6')">6</button>
+      <button class="modal-btn" onclick="mPress('7')">7</button>
+      <button class="modal-btn" onclick="mPress('8')">8</button>
+      <button class="modal-btn" onclick="mPress('9')">9</button>
+      <button class="modal-btn empty"></button>
+      <button class="modal-btn" onclick="mPress('0')">0</button>
+      <button class="modal-btn del" onclick="mDel()">⌫</button>
+    </div>
+    <div class="modal-err" id="modalErr"></div>
+    <button class="modal-cancel" onclick="mCancel()">Cancelar</button>
+  </div>
+</div>
+
 <script>
 const PIN = '1234';
+const ADMIN_CODE = '9876'; // código para cambiar estado y borrar — cambiar en producción
 const REC_KEY = 'ff_pedidos_v1';
 const EMP_KEY = 'ff_emp_v1';
 const STEPS = 4;
 const SNAMES = ['Datos del pedido','Preparado','Entrega','Resumen'];
 let cur = 0, pinBuf = '';
+// ── modal state
+let mBuf = '', mAction = null, mPayload = null;
 
 // ── VADEMECUM DATA ────────────────────────────────────────────────────────
 const VADE = [
@@ -525,7 +593,12 @@ function val(idx){
   if(idx===1){
     if(!g('preparado').trim()){toast('Indicá el preparado solicitado');return false;}
     if(!g('cantidad')){toast('Indicá la cantidad');return false;}
-    if(!g('presentacion')){toast('Seleccioná la presentación');return false;}
+    if(prepEsNuevo){
+      if(!g('presentacionNueva').trim()){toast('Indicá la presentación del nuevo preparado');return false;}
+      if(!g('concentracion').trim()){toast('Indicá la concentración o variante');return false;}
+    } else {
+      if(!g('presentacion')){toast('Seleccioná la presentación');return false;}
+    }
   }
   if(idx===2){
     if(!document.querySelector('[name=urg]:checked')){toast('Seleccioná la urgencia');return false;}
@@ -542,6 +615,14 @@ function sr(card,name,val){
   });
   const r=card.querySelector('input[type=radio]');if(r)r.checked=true;
   card.classList.add(['normal','sucursal','coordinado'].includes(val)?'sv':'sam');
+}
+function toggleRetiraFields(val){
+  const show = (val==='sucursal'||val==='cliente');
+  const fields=document.getElementById('retiraFields');
+  fields.style.display=show?'block':'none';
+  document.getElementById('retiraNombre').required=show;
+  document.getElementById('retiraDNI').required=show;
+  if(!show){document.getElementById('retiraNombre').value='';document.getElementById('retiraDNI').value='';}
 }
 function togConf(){
   const cb=document.getElementById('conf');cb.checked=!cb.checked;
@@ -567,29 +648,81 @@ function renderEmpSug(emps,typed){
 }
 
 // ── PREPARADO AUTOCOMPLETE ─────────────────────────────────────────────────
+let prepEsNuevo = false; // flag: true cuando el usuario eligió "Crear nuevo"
+
 function prepInput(){
   const v=g('preparado').toLowerCase().trim();
+  prepEsNuevo=false;
+  toggleCamposNuevo(false);
+  hidePrepCard();
   if(v.length<1){document.getElementById('prepSug').style.display='none';return;}
   const matches=VADE.filter(p=>p.n.toLowerCase().includes(v)||p.cat.toLowerCase().includes(v)||p.acc.toLowerCase().includes(v));
-  renderPrepSug(matches);
+  renderPrepSug(matches, v);
 }
-function prepFocus(){const v=g('preparado').toLowerCase().trim();if(v.length>=1)prepInput();}
+function prepFocus(){const v=g('preparado').toLowerCase().trim();if(v.length>=1)renderPrepSug(VADE.filter(p=>p.n.toLowerCase().includes(v)||p.cat.toLowerCase().includes(v)),v);}
 function prepBlur(){setTimeout(()=>{document.getElementById('prepSug').style.display='none';},200);}
-function renderPrepSug(items){
+
+function renderPrepSug(items, typed){
   const sug=document.getElementById('prepSug');sug.innerHTML='';
-  if(!items.length){sug.style.display='none';return;}
-  const cats={};
-  items.forEach(p=>{if(!cats[p.cat])cats[p.cat]=[];cats[p.cat].push(p);});
-  Object.keys(cats).forEach(cat=>{
-    const ch=document.createElement('div');ch.className='ac-cat';ch.textContent=cat;sug.appendChild(ch);
-    cats[cat].forEach(p=>{
+  // Resultados del Vademecum primero
+  if(items.length){
+    const ch=document.createElement('div');ch.className='ac-cat';ch.textContent='En el Vademecum';sug.appendChild(ch);
+    items.forEach(p=>{
       const it=document.createElement('div');it.className='ac-item';
-      it.innerHTML=`<strong style="font-size:13px">${p.n}</strong><br><span style="font-size:11px;color:var(--gm)">${p.acc||''}</span>`;
-      it.onmousedown=()=>{document.getElementById('preparado').value=p.n;sug.style.display='none';showPrepCard(p);};
+      it.innerHTML=`<strong style="font-size:13px">${p.n}</strong><br><span style="font-size:11px;color:var(--gm)">${p.acc||''} · ${p.pres||''}</span>`;
+      it.onmousedown=()=>{
+        document.getElementById('preparado').value=p.n;
+        sug.style.display='none';
+        prepEsNuevo=false;
+        toggleCamposNuevo(false);
+        showPrepCard(p);
+      };
       sug.appendChild(it);
     });
-  });
-  sug.style.display='block';
+  }
+  // Siempre al final: opción de crear nuevo
+  if(typed && typed.length>1){
+    const sep=document.createElement('div');sep.className='ac-cat';sep.textContent='No está en el Vademecum';sug.appendChild(sep);
+    const it=document.createElement('div');it.className='ac-item';
+    it.style.cssText='color:var(--azul);font-weight:500;display:flex;align-items:center;gap:8px';
+    it.innerHTML=`<span style="font-size:16px">✚</span><div><strong style="font-size:13px">Crear pedido para "${typed}"</strong><br><span style="font-size:11px;color:var(--gm);font-weight:400">Indicá presentación y concentración manualmente</span></div>`;
+    it.onmousedown=()=>{
+      document.getElementById('preparado').value=typed.charAt(0).toUpperCase()+typed.slice(1);
+      sug.style.display='none';
+      prepEsNuevo=true;
+      hidePrepCard();
+      toggleCamposNuevo(true);
+    };
+    sug.appendChild(it);
+  }
+  sug.style.display=sug.children.length>0?'block':'none';
+}
+
+function hidePrepCard(){
+  const card=document.getElementById('prepCard');
+  card.classList.remove('on');card.innerHTML='';
+}
+
+function toggleCamposNuevo(show){
+  // Cuando es nuevo: presentacion pasa a texto libre, concentracion queda igual
+  const selPres=document.getElementById('presentacion');
+  const inputPresNuevo=document.getElementById('presentacionNueva');
+  const labelConc=document.getElementById('labelConc');
+  if(show){
+    selPres.style.display='none';
+    inputPresNuevo.style.display='block';
+    labelConc.textContent='Concentración / Variante *';
+    inputPresNuevo.required=true; selPres.required=false;
+    // Mostrar aviso
+    document.getElementById('avisoNuevo').style.display='block';
+  } else {
+    selPres.style.display='block';
+    inputPresNuevo.style.display='none';
+    inputPresNuevo.value='';
+    labelConc.textContent='Concentración / Variante';
+    selPres.required=true; inputPresNuevo.required=false;
+    document.getElementById('avisoNuevo').style.display='none';
+  }
 }
 function showPrepCard(p){
   const card=document.getElementById('prepCard');
@@ -618,14 +751,16 @@ function buildSum(){
       <div class="srow"><span class="sk">WhatsApp previo</span><span class="sv2">${g('tieneWA')}</span></div>
     </div>
     <div class="scard"><div class="schdr">Preparado</div>
-      <div class="srow"><span class="sk">Preparado</span><span class="sv2">${g('preparado')}</span></div>
-      <div class="srow"><span class="sk">Cantidad</span><span class="sv2">${g('cantidad')} ${g('presentacion')}</span></div>
+      <div class="srow"><span class="sk">Preparado</span><span class="sv2">${g('preparado')}${prepEsNuevo?' <span style="font-size:10px;background:var(--ambg);color:var(--am);padding:1px 6px;border-radius:10px;font-weight:600">Nuevo</span>':''}</span></div>
+      <div class="srow"><span class="sk">Cantidad</span><span class="sv2">${g('cantidad')} ${prepEsNuevo?g('presentacionNueva'):g('presentacion')}</span></div>
       ${g('concentracion')?`<div class="srow"><span class="sk">Concentración</span><span class="sv2">${g('concentracion')}</span></div>`:''}
       ${g('indicaciones')?`<div class="srow"><span class="sk">Indicaciones</span><span class="sv2" style="font-style:italic">${g('indicaciones')}</span></div>`:''}
     </div>
     <div class="scard"><div class="schdr">Entrega</div>
       <div class="srow"><span class="sk">Urgencia</span><span class="sv2">${rv('urg')==='urgente'?'⚠ Urgente':'Normal'}</span></div>
       <div class="srow"><span class="sk">Retira</span><span class="sv2">${rv('retira')||'—'}</span></div>
+      ${g('retiraNombre')?`<div class="srow"><span class="sk">Nombre retira</span><span class="sv2">${g('retiraNombre')}</span></div>`:''}
+      ${g('retiraDNI')?`<div class="srow"><span class="sk">DNI retira</span><span class="sv2">${g('retiraDNI')}</span></div>`:''}
       ${g('obs')?`<div class="srow"><span class="sk">Observaciones</span><span class="sv2" style="font-style:italic">${g('obs')}</span></div>`:''}
     </div>`;
 }
@@ -639,9 +774,13 @@ function submitForm(){
     id,ts:now.toISOString(),estado:'pendiente',
     sucursal:g('sucursal'),encargado:g('encargado'),fecha:g('fecha'),
     receta:g('receta'),tieneWA:g('tieneWA'),
-    preparado:g('preparado'),cantidad:g('cantidad'),presentacion:g('presentacion'),
+    preparado:g('preparado'),esNuevo:prepEsNuevo,
+    cantidad:g('cantidad'),
+    presentacion:prepEsNuevo?g('presentacionNueva'):g('presentacion'),
     concentracion:g('concentracion'),indicaciones:g('indicaciones'),
-    urgencia:rv('urg'),retira:rv('retira'),obs:g('obs')
+    urgencia:rv('urg'),retira:rv('retira'),
+    retiraNombre:g('retiraNombre'),retiraDNI:g('retiraDNI'),
+    obs:g('obs')
   };
   const recs=getRecs();recs.unshift(rec);localStorage.setItem(REC_KEY,JSON.stringify(recs.slice(0,300)));
   document.getElementById('succId').textContent='ID: '+id;
@@ -673,22 +812,81 @@ function renderHist(f){
       </div>
       <div class="hcbody" id="hb-${i}">
         <div class="hdet">
+          <strong>Preparado:</strong> ${r.preparado}${r.esNuevo?' <span style="font-size:10px;background:#FAEEDA;color:#633806;padding:1px 6px;border-radius:10px;font-weight:600">Nuevo</span>':''}<br>
           <strong>Cantidad:</strong> ${r.cantidad} ${r.presentacion}${r.concentracion?' · '+r.concentracion:''}<br>
           <strong>Receta:</strong> ${r.receta} · <strong>Urgencia:</strong> ${r.urgencia}<br>
+          ${r.retiraNombre?`<strong>Retira:</strong> ${r.retiraNombre} &nbsp;·&nbsp; <strong>DNI:</strong> ${r.retiraDNI}<br>`:''}
           ${r.indicaciones?`<strong>Indicaciones:</strong> <em>${r.indicaciones}</em><br>`:''}
           ${r.obs?`<strong>Obs:</strong> <em>${r.obs}</em><br>`:''}
           <strong>ID:</strong> ${r.id}
         </div>
         <div style="margin-top:8px;display:flex;gap:6px">
           <button onclick="event.stopPropagation();markDone(${i})" style="font-size:11px;background:var(--vbg);color:var(--verde);border:1px solid var(--vb);border-radius:6px;padding:4px 10px;cursor:pointer">✓ Marcar entregado</button>
+          <button onclick="event.stopPropagation();deleteOne(${i})" style="font-size:11px;background:var(--rbg);color:var(--rojo);border:1px solid var(--rb);border-radius:6px;padding:4px 10px;cursor:pointer">✕ Eliminar</button>
         </div>
       </div>
     </div>`;
   }).join('');
 }
 function togH(i){const b=document.getElementById('hb-'+i);if(b)b.classList.toggle('on');}
-function markDone(i){const recs=getRecs();if(recs[i])recs[i].estado='entregado';localStorage.setItem(REC_KEY,JSON.stringify(recs));renderHist(curF);}
-function clearHist(){if(confirm('¿Borrar todos los pedidos registrados?')){localStorage.removeItem(REC_KEY);renderHist('all');}}
+function markDone(i){
+  openModal('Marcar como entregado','Ingresá el código del laboratorio para confirmar','markDone',i);
+}
+function clearHist(){
+  openModal('Borrar todos los pedidos','Ingresá el código del laboratorio para confirmar. Esta acción no se puede deshacer.','clearAll',null);
+}
+function deleteOne(i){
+  openModal('Eliminar pedido','Ingresá el código del laboratorio para confirmar','deleteOne',i);
+}
+
+// ── MODAL CÓDIGO ────────────────────────────────────────────────────────────
+function openModal(title, sub, action, payload){
+  mBuf=''; mAction=action; mPayload=payload;
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalSub').textContent=sub;
+  document.getElementById('modalErr').textContent='';
+  renderMDots(false);
+  document.getElementById('modalBg').classList.add('open');
+}
+function mPress(d){
+  if(mBuf.length>=4) return;
+  mBuf+=d; renderMDots(false);
+  if(mBuf.length===4){
+    setTimeout(()=>{
+      if(mBuf===ADMIN_CODE){
+        document.getElementById('modalBg').classList.remove('open');
+        execAction(mAction, mPayload);
+      } else {
+        renderMDots(true);
+        document.getElementById('modalErr').textContent='Código incorrecto. Intentá de nuevo.';
+        setTimeout(()=>{mBuf='';renderMDots(false);document.getElementById('modalErr').textContent='';},900);
+      }
+    },120);
+  }
+}
+function mDel(){mBuf=mBuf.slice(0,-1);renderMDots(false);}
+function mCancel(){mBuf='';document.getElementById('modalBg').classList.remove('open');}
+function renderMDots(wrong){
+  for(let i=0;i<4;i++){
+    const d=document.getElementById('md'+i);
+    d.className='modal-dot'+(i<mBuf.length?(wrong?' wrong':' filled'):'');
+  }
+}
+function execAction(action, payload){
+  if(action==='markDone'){
+    const recs=getRecs();
+    if(recs[payload]){recs[payload].estado='entregado';localStorage.setItem(REC_KEY,JSON.stringify(recs));}
+    renderHist(curF);
+  } else if(action==='clearAll'){
+    localStorage.removeItem(REC_KEY);
+    renderHist('all');
+  } else if(action==='deleteOne'){
+    const recs=getRecs();
+    recs.splice(payload,1);
+    localStorage.setItem(REC_KEY,JSON.stringify(recs));
+    renderHist(curF);
+  }
+}
 
 // ── VADEMECUM ──────────────────────────────────────────────────────────────
 function renderVade(q){
