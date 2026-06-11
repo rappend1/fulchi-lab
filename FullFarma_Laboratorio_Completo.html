@@ -1,0 +1,1865 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedido de Preparados — FullFarma Laboratorio</title>
+<style>
+:root {
+  --verde:#27500A;--vbg:#EAF3DE;--vmid:#639922;--vb:#C0DD97;
+  --azul:#0C447C;--abg:#E6F1FB;--ab:#85B7EB;
+  --am:#633806;--ambg:#FAEEDA;--abb:#FAC775;
+  --rojo:#791F1F;--rbg:#FCEBEB;--rb:#F09595;
+  --violeta:#3C3489;--vibg:#EEEDFE;--vib:#B5B0F5;
+  --radius:10px;
+  --gt:#444441;--gl:#F1EFE8;--gb:#D3D1C7;--gm:#888780;
+  --negro:#1a1a1a;--blanco:#ffffff;
+  --f:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f);background:#f5f4f0;color:var(--gt);min-height:100vh}
+
+/* ── PIN ── */
+.pin-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+.pin-logo{width:60px;height:60px;background:var(--vbg);border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.pin-logo svg{width:30px;height:30px;stroke:var(--verde);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.pin-title{font-size:18px;font-weight:700;color:var(--negro);margin-bottom:4px;text-align:center}
+.pin-sub{font-size:13px;color:var(--gm);margin-bottom:24px;text-align:center}
+.pin-dots{display:flex;gap:12px;margin-bottom:20px}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--gb);background:var(--blanco);transition:all .15s}
+.pin-dot.filled{background:var(--vmid);border-color:var(--vmid)}
+.pin-dot.wrong{background:var(--rojo);border-color:var(--rojo)}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:240px}
+.pin-btn{padding:17px 0;border:1px solid var(--gb);border-radius:12px;background:var(--blanco);font-size:20px;font-weight:600;color:var(--negro);cursor:pointer;transition:background .1s,transform .1s;-webkit-tap-highlight-color:transparent}
+.pin-btn:active{background:var(--vbg);transform:scale(.95)}
+.pin-btn.del{font-size:15px;color:var(--gm)}
+.pin-btn.empty{visibility:hidden}
+.pin-error{font-size:12px;color:var(--rojo);margin-top:8px;min-height:16px;text-align:center}
+.pin-hint{font-size:11px;color:var(--gm);margin-top:18px;text-align:center;line-height:1.6}
+
+/* ── APP ── */
+.app{display:none}
+.app.on{display:block}
+.header{background:var(--blanco);border-bottom:1px solid var(--gb);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header-l{display:flex;align-items:center;gap:10px}
+.hicon{width:34px;height:34px;background:var(--vbg);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hicon svg{width:18px;height:18px;stroke:var(--verde);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.header h1{font-size:14px;font-weight:600;color:var(--negro)}
+.header p{font-size:11px;color:var(--gm)}
+.btn-out{font-size:11px;color:var(--gm);background:none;border:1px solid var(--gb);cursor:pointer;padding:4px 8px;border-radius:6px}
+.tabs{display:flex;background:var(--blanco);border-bottom:1px solid var(--gb)}
+.tab{flex:1;padding:10px 0;text-align:center;font-size:12px;font-weight:500;color:var(--gm);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.tab.on{color:var(--verde);border-bottom-color:var(--verde)}
+.tc{display:none}
+.tc.on{display:block}
+
+/* ── PROGRESS ── */
+.prog{background:var(--blanco);border-bottom:1px solid var(--gb);padding:10px 16px 12px}
+.pdots{display:flex;gap:4px;align-items:center;margin-bottom:5px}
+.pd{width:8px;height:8px;border-radius:50%;background:var(--gb);transition:background .2s}
+.pd.on{background:var(--vmid)}.pd.done{background:var(--verde)}
+.plbl{font-size:11px;color:var(--gm)}
+.plbl span{color:var(--verde);font-weight:600}
+
+/* ── FORM ── */
+.fbody{padding:14px 14px 88px;max-width:640px;margin:0 auto}
+.sec{display:none;animation:fi .2s ease}
+.sec.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.shdr{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--gb)}
+.snum{width:26px;height:26px;border-radius:50%;background:var(--verde);color:var(--blanco);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stit{font-size:14px;font-weight:600;color:var(--negro)}
+.ssub{font-size:11px;color:var(--gm);margin-top:1px}
+.field{margin-bottom:13px}
+.field label{display:block;font-size:12px;font-weight:500;color:var(--negro);margin-bottom:4px}
+.req{color:#E24B4A;margin-left:2px}
+.hint{font-size:10px;font-weight:400;color:var(--gm);display:block;margin-top:1px}
+input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--gb);border-radius:8px;font-size:13px;font-family:var(--f);color:var(--negro);background:var(--blanco);transition:border-color .15s,box-shadow .15s;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--ab);box-shadow:0 0 0 3px rgba(55,138,221,.1)}
+textarea{min-height:72px;resize:vertical;line-height:1.5}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* autocomplete */
+.ac-wrap{position:relative}
+.ac-list{position:absolute;top:100%;left:0;right:0;background:var(--blanco);border:1px solid var(--ab);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);z-index:50;overflow:hidden;display:none;max-height:220px;overflow-y:auto}
+.ac-item{padding:9px 12px;font-size:13px;cursor:pointer;color:var(--negro);border-bottom:1px solid var(--gb)}
+.ac-item:last-child{border-bottom:none}
+.ac-item:hover,.ac-item.sel{background:var(--vbg)}
+.ac-cat{padding:5px 12px;font-size:10px;font-weight:600;color:var(--gm);background:var(--gl);text-transform:uppercase;letter-spacing:.05em}
+
+/* opt cards */
+.og{display:flex;flex-direction:column;gap:5px}
+.oc{display:flex;align-items:center;gap:9px;padding:9px 11px;border:1px solid var(--gb);border-radius:8px;cursor:pointer;transition:border-color .15s,background .15s;background:var(--blanco);-webkit-tap-highlight-color:transparent}
+.oc:hover{border-color:var(--ab)}
+.oc input{width:auto;padding:0;border:none;box-shadow:none;accent-color:var(--verde)}
+.oc.sv{border-color:var(--vb);background:var(--vbg)}
+.oc.sam{border-color:var(--abb);background:var(--ambg)}
+.ol{font-size:13px;color:var(--negro)}
+.os{font-size:10px;color:var(--gm);margin-top:1px}
+
+/* product info card */
+.pcard{background:var(--vbg);border:1px solid var(--vb);border-radius:10px;padding:12px 14px;margin-top:8px;display:none}
+.pcard.on{display:block}
+.pcard-name{font-size:13px;font-weight:600;color:var(--verde);margin-bottom:8px}
+.pcard-row{display:flex;gap:8px;margin-bottom:4px;font-size:11px}
+.pcard-key{color:var(--gm);min-width:100px;flex-shrink:0}
+.pcard-val{color:var(--negro)}
+.pcard-warn{background:var(--ambg);border:1px solid var(--abb);border-radius:6px;padding:7px 10px;font-size:11px;color:var(--am);margin-top:8px;line-height:1.5}
+
+/* alert */
+.alert{display:flex;gap:9px;align-items:flex-start;padding:9px 11px;border-radius:8px;margin-bottom:11px;font-size:12px;line-height:1.5}
+.ai{font-size:15px;flex-shrink:0;margin-top:1px}
+.al-v{background:var(--vbg);color:var(--verde);border:1px solid var(--vb)}
+.al-a{background:var(--ambg);color:var(--am);border:1px solid var(--abb)}
+.al-b{background:var(--abg);color:var(--azul);border:1px solid var(--ab)}
+
+/* nav */
+.nav{position:fixed;bottom:0;left:0;right:0;background:var(--blanco);border-top:1px solid var(--gb);padding:10px 14px 16px;display:flex;gap:8px;max-width:640px;margin:0 auto;z-index:100}
+.btn-back{flex:0 0 76px;padding:11px;border:1px solid var(--gb);border-radius:8px;background:var(--blanco);font-size:13px;font-weight:500;color:var(--gt);cursor:pointer}
+.btn-next{flex:1;padding:11px;border:none;border-radius:8px;background:var(--verde);color:var(--blanco);font-size:13px;font-weight:600;cursor:pointer}
+.btn-sub{flex:1;padding:11px;border:none;border-radius:8px;background:var(--azul);color:var(--blanco);font-size:13px;font-weight:600;cursor:pointer}
+
+/* summary */
+.scard{background:var(--blanco);border:1px solid var(--gb);border-radius:10px;overflow:hidden;margin-bottom:10px}
+.schdr{padding:8px 12px;background:var(--gl);font-size:11px;font-weight:600;color:var(--gm);text-transform:uppercase;letter-spacing:.04em}
+.srow{display:flex;justify-content:space-between;padding:7px 12px;border-top:1px solid var(--gb);font-size:12px}
+.srow:first-of-type{border-top:none}
+.sk{color:var(--gm)}.sv2{font-weight:500;color:var(--negro);text-align:right;max-width:65%}
+
+/* success */
+.succ{display:none;text-align:center;padding:36px 16px}
+.succ.on{display:block}
+.sico{width:60px;height:60px;border-radius:50%;background:var(--vbg);margin:0 auto 14px;display:flex;align-items:center;justify-content:center}
+.sico svg{width:30px;height:30px;stroke:var(--verde);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.stit2{font-size:19px;font-weight:700;color:var(--negro);margin-bottom:7px}
+.ssub2{font-size:13px;color:var(--gm);line-height:1.6;margin-bottom:18px}
+.sid{display:inline-block;padding:7px 18px;background:var(--vbg);color:var(--verde);border-radius:20px;font-size:13px;font-weight:600;margin-bottom:18px}
+.btn-new{padding:11px 24px;background:var(--verde);color:var(--blanco);border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+
+/* historial */
+.hwrap{padding:14px;max-width:640px;margin:0 auto;padding-bottom:20px}
+.hbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.hcount{font-size:13px;font-weight:600;color:var(--negro)}
+.hfils{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.hfil{padding:5px 11px;border:1px solid var(--gb);border-radius:20px;font-size:12px;background:var(--blanco);color:var(--gt);cursor:pointer;transition:all .15s}
+.hfil.on{background:var(--verde);color:var(--blanco);border-color:var(--verde)}
+.hempty{text-align:center;padding:40px 20px;color:var(--gm);font-size:13px}
+.hcard{background:var(--blanco);border:1px solid var(--gb);border-radius:10px;margin-bottom:8px;overflow:hidden;cursor:pointer}
+.hcard:hover{border-color:var(--ab)}
+.hchdr{display:flex;justify-content:space-between;align-items:center;padding:10px 13px}
+.hcl h3{font-size:13px;font-weight:600;color:var(--negro)}
+.hcl p{font-size:11px;color:var(--gm);margin-top:2px}
+.hcbody{padding:0 13px 11px;border-top:1px solid var(--gb);display:none}
+.hcbody.on{display:block}
+.hdet{font-size:11px;color:var(--gt);line-height:1.7;margin-top:8px}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+.bv{background:var(--vbg);color:var(--verde)}.ba{background:var(--ambg);color:var(--am)}.br{background:var(--rbg);color:var(--rojo)}
+
+/* ── modal codigo ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:flex-end;justify-content:center}
+.modal-bg.open{display:flex}
+.modal-box{background:var(--blanco);border-radius:16px 16px 0 0;padding:20px 16px 32px;width:100%;max-width:480px;animation:slideUp .2s ease}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-title{font-size:15px;font-weight:700;color:var(--negro);margin-bottom:4px;text-align:center}
+.modal-sub{font-size:12px;color:var(--gm);text-align:center;margin-bottom:16px}
+.modal-dots{display:flex;gap:10px;justify-content:center;margin-bottom:16px}
+.modal-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--gb);background:var(--blanco);transition:all .15s}
+.modal-dot.filled{background:var(--azul);border-color:var(--azul)}
+.modal-dot.wrong{background:var(--rojo);border-color:var(--rojo)}
+.modal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.modal-btn{padding:15px 0;border:1px solid var(--gb);border-radius:10px;background:var(--blanco);font-size:18px;font-weight:600;color:var(--negro);cursor:pointer;transition:background .1s,transform .1s;-webkit-tap-highlight-color:transparent}
+.modal-btn:active{background:var(--abg);transform:scale(.95)}
+.modal-btn.del{font-size:14px;color:var(--gm)}
+.modal-btn.empty{visibility:hidden}
+.modal-err{font-size:12px;color:var(--rojo);text-align:center;min-height:16px;margin-top:6px}
+.modal-cancel{width:100%;margin-top:8px;padding:12px;background:var(--gl);border:none;border-radius:10px;font-size:14px;font-weight:500;color:var(--gt);cursor:pointer}
+
+/* vademecum tab */
+.vwrap{padding:14px;max-width:640px;margin:0 auto;padding-bottom:20px}
+.vsearch{width:100%;padding:10px 12px;border:1px solid var(--gb);border-radius:8px;font-size:13px;margin-bottom:12px;background:var(--blanco)}
+.vcard{background:var(--blanco);border:1px solid var(--gb);border-radius:10px;margin-bottom:8px;overflow:hidden;cursor:pointer}
+.vcard:hover{border-color:var(--vb)}
+.vcH{display:flex;justify-content:space-between;align-items:center;padding:10px 13px}
+.vcH h3{font-size:13px;font-weight:600;color:var(--negro)}
+.vcH p{font-size:11px;color:var(--gm);margin-top:2px}
+.vcbody{padding:0 13px 12px;border-top:1px solid var(--gb);display:none}
+.vcbody.on{display:block}
+.vrow{display:flex;gap:8px;margin-top:7px;font-size:12px}
+.vk{color:var(--gm);min-width:110px;flex-shrink:0;font-weight:500}
+.vv{color:var(--negro);line-height:1.5}
+.vtag{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600;background:var(--vbg);color:var(--verde);margin-bottom:6px}
+
+/* ══ KANBAN TAB ══════════════════════════════════════════════════════════ */
+/* PIN kanban */
+.kpin-overlay{display:none;position:absolute;inset:0;background:var(--gl);
+  z-index:10;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.kpin-overlay.show{display:flex}
+.kpin-logo{width:52px;height:52px;background:var(--vbg);border-radius:14px;
+  display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.kpin-logo svg{width:26px;height:26px;stroke:var(--verde);fill:none;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round}
+.kpin-title{font-size:17px;font-weight:700;color:var(--negro);margin-bottom:4px;text-align:center}
+.kpin-sub{font-size:12px;color:var(--gm);margin-bottom:22px;text-align:center}
+.kpin-dots{display:flex;gap:11px;margin-bottom:18px}
+.kpin-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--gb);background:var(--blanco);transition:all .15s}
+.kpin-dot.filled{background:var(--vmid);border-color:var(--vmid)}
+.kpin-dot.wrong{background:var(--rojo);border-color:var(--rojo)}
+.kpin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;width:230px}
+.kpin-btn{padding:16px 0;border:1px solid var(--gb);border-radius:11px;background:var(--blanco);
+  font-size:19px;font-weight:600;color:var(--negro);cursor:pointer;
+  transition:background .1s,transform .1s;-webkit-tap-highlight-color:transparent}
+.kpin-btn:active{background:var(--vbg);transform:scale(.95)}
+.kpin-btn.del{font-size:14px;color:var(--gm)}
+.kpin-btn.empty{visibility:hidden}
+.kpin-err{font-size:11px;color:var(--rojo);margin-top:6px;min-height:15px;text-align:center}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--f);background:var(--gl);color:var(--gt)}
+
+/* ── HEADER ─────────────────────────────────────────────────── */
+.header{
+  background:var(--blanco);border-bottom:1px solid var(--gb);
+  padding:12px 20px;display:flex;align-items:center;
+  justify-content:space-between;position:sticky;top:0;z-index:100;
+  gap:12px;
+}
+.header-brand{display:flex;align-items:center;gap:10px}
+.hlogo{width:36px;height:36px;background:var(--vbg);border-radius:9px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hlogo svg{width:20px;height:20px;stroke:var(--verde);fill:none;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round}
+.header h1{font-size:14px;font-weight:600;color:var(--negro)}
+.header p{font-size:11px;color:var(--gm)}
+.header-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.btn-add{
+  display:flex;align-items:center;gap:5px;
+  padding:7px 13px;border:none;border-radius:8px;
+  background:var(--verde);color:var(--blanco);
+  font-size:12px;font-weight:600;cursor:pointer;
+  transition:background .15s;white-space:nowrap;
+}
+.btn-add:hover{background:#1e3d08}
+.btn-add svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round}
+.badge-total{
+  background:var(--abg);color:var(--azul);
+  font-size:11px;font-weight:600;
+  padding:4px 10px;border-radius:20px;white-space:nowrap;
+}
+
+/* ── FILTROS ─────────────────────────────────────────────────── */
+.filter-bar{
+  background:var(--blanco);border-bottom:1px solid var(--gb);
+  padding:8px 20px;display:flex;align-items:center;gap:8px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+}
+.filter-bar::-webkit-scrollbar{height:0}
+.filter-btn{
+  padding:5px 12px;border:1px solid var(--gb);border-radius:20px;
+  font-size:12px;background:var(--blanco);color:var(--gt);
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.filter-btn.on{background:var(--azul);color:var(--blanco);border-color:var(--azul)}
+.filter-sep{width:1px;height:18px;background:var(--gb);flex-shrink:0}
+.search-wrap{position:relative;flex-shrink:0}
+.search-wrap input{
+  padding:5px 10px 5px 28px;border:1px solid var(--gb);border-radius:20px;
+  font-size:12px;font-family:var(--f);color:var(--negro);background:var(--blanco);
+  width:160px;transition:border-color .15s;
+}
+.search-wrap input:focus{outline:none;border-color:var(--ab)}
+.search-wrap svg{
+  position:absolute;left:9px;top:50%;transform:translateY(-50%);
+  width:13px;height:13px;stroke:var(--gm);fill:none;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round;pointer-events:none;
+}
+
+/* ── BOARD ────────────────────────────────────────────────────── */
+.board{
+  display:flex;gap:12px;padding:16px 20px 32px;
+  overflow-x:auto;align-items:flex-start;min-height:calc(100vh - 110px);
+  -webkit-overflow-scrolling:touch;
+}
+.board::-webkit-scrollbar{height:6px}
+.board::-webkit-scrollbar-track{background:transparent}
+.board::-webkit-scrollbar-thumb{background:var(--gb);border-radius:3px}
+
+/* ── COLUMNAS ────────────────────────────────────────────────── */
+.col{
+  flex:0 0 240px;display:flex;flex-direction:column;
+  background:var(--blanco);border-radius:var(--radius);
+  border:1px solid var(--gb);overflow:hidden;
+  transition:box-shadow .2s;
+}
+.col.drag-over{box-shadow:0 0 0 2px var(--azul);border-color:var(--azul)}
+.col-header{padding:11px 13px 10px;border-bottom:1px solid var(--gb)}
+.col-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px}
+.col-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-right:7px}
+.col-name{font-size:12px;font-weight:600;color:var(--negro);display:flex;align-items:center}
+.col-count{
+  font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;
+}
+.col-eta{font-size:10px;color:var(--gm);padding-left:15px}
+.cards{
+  padding:10px;display:flex;flex-direction:column;gap:8px;
+  min-height:80px;flex:1;
+}
+.empty-col{
+  text-align:center;padding:20px 12px;
+  font-size:11px;color:var(--gm);line-height:1.6;
+  border:1.5px dashed var(--gb);border-radius:8px;
+  margin:4px;
+}
+
+/* Colores por columna */
+.col[data-col="recibido"] .col-dot{background:#64b5f6}
+.col[data-col="recibido"] .col-count{background:#E3F2FD;color:#1565C0}
+.col[data-col="presupuestado"] .col-dot{background:var(--abb)}
+.col[data-col="presupuestado"] .col-count{background:var(--ambg);color:var(--am)}
+.col[data-col="elaboracion"] .col-dot{background:var(--vib)}
+.col[data-col="elaboracion"] .col-count{background:var(--vibg);color:var(--violeta)}
+.col[data-col="listo"] .col-dot{background:var(--vmid)}
+.col[data-col="listo"] .col-count{background:var(--vbg);color:var(--verde)}
+.col[data-col="entregado"] .col-dot{background:var(--gm)}
+.col[data-col="entregado"] .col-count{background:var(--gl);color:var(--gm)}
+
+/* ── TARJETAS ─────────────────────────────────────────────────── */
+.card{
+  background:var(--blanco);border:1px solid var(--gb);border-radius:9px;
+  padding:11px 12px;cursor:grab;
+  transition:box-shadow .15s,transform .15s,opacity .15s;
+  position:relative;overflow:hidden;
+}
+.card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:3px;
+}
+.card[data-urg="urgente"]::before{background:var(--rojo)}
+.card[data-urg="normal"]::before{background:var(--gb)}
+.card:hover{box-shadow:0 2px 10px rgba(0,0,0,.1);transform:translateY(-1px)}
+.card.dragging{opacity:.4;transform:scale(.97)}
+.card.new-flash{animation:flash .6s ease}
+@keyframes flash{0%{background:#FFF9C4}100%{background:var(--blanco)}}
+.card-id{font-size:9.5px;color:var(--gm);font-family:monospace;margin-bottom:4px}
+.card-name{font-size:13px;font-weight:600;color:var(--negro);line-height:1.3;margin-bottom:4px}
+.card-meta{font-size:11px;color:var(--gm);margin-bottom:6px;line-height:1.5}
+.card-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px}
+.tag{font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px}
+.tag-suc{background:var(--abg);color:var(--azul)}
+.tag-urg{background:var(--rbg);color:var(--rojo)}
+.tag-new{background:var(--ambg);color:var(--am)}
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+.card-date{font-size:10px;color:var(--gm)}
+.card-actions{display:flex;gap:4px;opacity:0;transition:opacity .15s}
+.card:hover .card-actions{opacity:1}
+.card-btn{
+  width:24px;height:24px;border:none;border-radius:6px;
+  background:var(--gl);color:var(--gm);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .15s,color .15s;
+}
+.card-btn:hover{background:var(--gb);color:var(--negro)}
+.card-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round}
+.days-badge{
+  font-size:9.5px;font-weight:600;padding:2px 6px;border-radius:20px;
+}
+.days-ok{background:var(--vbg);color:var(--verde)}
+.days-warn{background:var(--ambg);color:var(--am)}
+.days-late{background:var(--rbg);color:var(--rojo)}
+
+/* ── MODAL DETALLE ────────────────────────────────────────────── */
+.modal-bg{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.45);z-index:200;
+  align-items:center;justify-content:center;padding:16px;
+}
+.modal-bg.open{display:flex}
+.modal{
+  background:var(--blanco);border-radius:14px;
+  width:100%;max-width:480px;max-height:90vh;
+  overflow-y:auto;animation:mIn .2s ease;
+}
+@keyframes mIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.modal-hdr{
+  padding:16px 18px;border-bottom:1px solid var(--gb);
+  display:flex;justify-content:space-between;align-items:flex-start;
+  position:sticky;top:0;background:var(--blanco);z-index:2;
+}
+.modal-hdr h2{font-size:15px;font-weight:700;color:var(--negro);line-height:1.3}
+.modal-close{
+  width:28px;height:28px;border:none;border-radius:7px;
+  background:var(--gl);cursor:pointer;color:var(--gm);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:16px;transition:background .15s;
+}
+.modal-close:hover{background:var(--gb)}
+.modal-body{padding:16px 18px}
+.modal-section{margin-bottom:14px}
+.modal-label{font-size:10px;font-weight:600;color:var(--gm);
+  text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.modal-value{font-size:13px;color:var(--negro);line-height:1.5}
+.modal-row{display:flex;gap:12px}
+.modal-row .modal-section{flex:1}
+.status-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.status-pill{
+  padding:6px 12px;border-radius:20px;border:1.5px solid var(--gb);
+  font-size:12px;font-weight:500;cursor:pointer;
+  transition:all .15s;background:var(--blanco);color:var(--gt);
+}
+.status-pill.active{border-width:2px}
+.status-pill[data-s="recibido"].active{background:#E3F2FD;border-color:#1565C0;color:#1565C0}
+.status-pill[data-s="presupuestado"].active{background:var(--ambg);border-color:var(--am);color:var(--am)}
+.status-pill[data-s="elaboracion"].active{background:var(--vibg);border-color:var(--violeta);color:var(--violeta)}
+.status-pill[data-s="listo"].active{background:var(--vbg);border-color:var(--verde);color:var(--verde)}
+.status-pill[data-s="entregado"].active{background:var(--gl);border-color:var(--gm);color:var(--gm)}
+.modal-footer{
+  padding:12px 18px;border-top:1px solid var(--gb);
+  display:flex;gap:8px;
+}
+.btn-save{
+  flex:1;padding:10px;border:none;border-radius:8px;
+  background:var(--verde);color:var(--blanco);
+  font-size:13px;font-weight:600;cursor:pointer;
+  transition:background .15s;
+}
+.btn-save:hover{background:#1e3d08}
+.btn-del{
+  padding:10px 14px;border:none;border-radius:8px;
+  background:var(--rbg);color:var(--rojo);
+  font-size:13px;cursor:pointer;transition:background .15s;
+}
+.btn-del:hover{background:var(--rb)}
+
+/* ── FORM NUEVO PEDIDO ────────────────────────────────────────── */
+.form-modal{display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.45);z-index:200;
+  align-items:flex-end;justify-content:center;
+}
+.form-modal.open{display:flex}
+.form-box{
+  background:var(--blanco);border-radius:16px 16px 0 0;
+  width:100%;max-width:540px;max-height:92vh;overflow-y:auto;
+  padding:20px 18px 28px;animation:slideUp .2s ease;
+}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.form-title{font-size:15px;font-weight:700;color:var(--negro);margin-bottom:14px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;font-weight:500;color:var(--negro);margin-bottom:4px}
+.field label .req{color:#E24B4A}
+.field input,.field select,.field textarea{
+  width:100%;padding:9px 11px;border:1px solid var(--gb);border-radius:8px;
+  font-size:13px;font-family:var(--f);color:var(--negro);background:var(--blanco);
+  transition:border-color .15s;-webkit-appearance:none;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  outline:none;border-color:var(--ab);box-shadow:0 0 0 3px rgba(55,138,221,.1);
+}
+.field textarea{min-height:64px;resize:vertical;line-height:1.5}
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-actions{display:flex;gap:8px;margin-top:14px}
+.btn-cancel{
+  flex:0 0 80px;padding:10px;border:1px solid var(--gb);border-radius:8px;
+  background:var(--blanco);font-size:13px;color:var(--gt);cursor:pointer;
+}
+.btn-create{
+  flex:1;padding:10px;border:none;border-radius:8px;
+  background:var(--verde);color:var(--blanco);
+  font-size:13px;font-weight:600;cursor:pointer;
+}
+
+/* ── TOAST ───────────────────────────────────────────────────── */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--negro);color:var(--blanco);
+  padding:9px 16px;border-radius:20px;font-size:12px;font-weight:500;
+  z-index:999;white-space:nowrap;pointer-events:none;
+  opacity:0;transition:opacity .3s;
+}
+.toast.show{opacity:1}
+
+/* ── INTEGRATION BANNER ──────────────────────────────────────── */
+.int-banner{
+  background:var(--vbg);border-bottom:1px solid var(--vb);
+  padding:7px 20px;display:flex;align-items:center;gap:8px;
+  font-size:11px;color:var(--verde);
+}
+.int-banner svg{width:14px;height:14px;stroke:var(--vmid);fill:none;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.int-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--vmid);
+  animation:pulse 2s infinite;flex-shrink:0;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────── */
+@media(max-width:600px){
+  .header{padding:10px 14px}
+  .board{padding:10px 12px 28px;gap:10px}
+  .col{flex:0 0 220px}
+  .badge-total{display:none}
+  .search-wrap input{width:130px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ PIN ═══════════════════════════════════════════════════════════════ -->
+<div class="pin-screen" id="pinScreen">
+  <div class="pin-logo">
+    <svg viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+  </div>
+  <div class="pin-title">FullFarma Laboratorio</div>
+  <div class="pin-sub">Pedidos de preparados magistrales</div>
+  <div class="pin-dots" id="pDots">
+    <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
+    <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
+  </div>
+  <div class="pin-grid">
+    <button class="pin-btn" onclick="pp('1')">1</button><button class="pin-btn" onclick="pp('2')">2</button><button class="pin-btn" onclick="pp('3')">3</button>
+    <button class="pin-btn" onclick="pp('4')">4</button><button class="pin-btn" onclick="pp('5')">5</button><button class="pin-btn" onclick="pp('6')">6</button>
+    <button class="pin-btn" onclick="pp('7')">7</button><button class="pin-btn" onclick="pp('8')">8</button><button class="pin-btn" onclick="pp('9')">9</button>
+    <button class="pin-btn empty"></button><button class="pin-btn" onclick="pp('0')">0</button><button class="pin-btn del" onclick="pd()">⌫</button>
+  </div>
+  <div class="pin-error" id="pErr"></div>
+  <div class="pin-hint">PIN demo: <strong>1234</strong><br>Laboratorio — Solo personal autorizado</div>
+</div>
+
+<!-- ══ APP ════════════════════════════════════════════════════════════════ -->
+<div class="app" id="app">
+  <div class="header">
+    <div class="header-l">
+      <div class="hicon"><svg viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg></div>
+      <div><h1>Pedidos de preparados</h1><p>FullFarma Laboratorio</p></div>
+    </div>
+    <button class="btn-out" onclick="logout()">Salir</button>
+  </div>
+  <div class="tabs">
+    <div class="tab on" id="t-form" onclick="st('form')">Nuevo pedido</div>
+    <div class="tab" id="t-hist" onclick="st('hist')">Historial</div>
+    <div class="tab" id="t-vade" onclick="st('vade')">Vademecum</div>
+    <div class="tab" id="t-kanban" onclick="st('kanban')">🗂 Tablero</div>
+  </div>
+
+  <!-- ── TAB FORMULARIO ── -->
+  <div class="tc on" id="tc-form">
+    <div class="prog" id="progWrap">
+      <div class="pdots" id="progDots"></div>
+      <div class="plbl" id="progLbl"></div>
+    </div>
+    <div class="fbody" id="fbody">
+
+      <!-- S1 Datos del pedido -->
+      <div class="sec on" data-s="0">
+        <div class="shdr"><div class="snum">1</div><div><div class="stit">Datos del pedido</div><div class="ssub">Sucursal e información básica</div></div></div>
+        <div class="alert al-b"><span class="ai">ℹ</span><span>Completá los datos del encargo. Los campos con <span style="color:#E24B4A;font-weight:700">*</span> son obligatorios.</span></div>
+
+        <div class="field">
+          <label>Sucursal solicitante <span class="req">*</span></label>
+          <select id="sucursal" required>
+            <option value="">Seleccionar sucursal...</option>
+            <option>Central Guernica</option>
+            <option>Central Numancia</option>
+            <option>Fullfarma Nueva</option>
+            <option>Fullfarma Berlin</option>
+            <option>Fullfarma Glew</option>
+            <option>Fullfarma Rivadavia</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Encargado por (nombre del empleado solicitante) <span class="req">*</span><span class="hint">Quien hace el pedido en la sucursal</span></label>
+          <div class="ac-wrap">
+            <input type="text" id="encargado" placeholder="Ej: García Mónica" autocomplete="off" oninput="empInput()" onfocus="empFocus()" onblur="empBlur()" required>
+            <div class="ac-list" id="empSug"></div>
+          </div>
+        </div>
+
+        <div class="r2">
+          <div class="field"><label>Fecha del pedido <span class="req">*</span></label><input type="date" id="fecha" required></div>
+          <div class="field"><label>¿Tiene receta médica? <span class="req">*</span></label>
+            <select id="receta" required>
+              <option value="">Seleccionar...</option>
+              <option value="Si">Sí</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>¿Ya fue conversado por WhatsApp con el laboratorio?</label>
+          <select id="tieneWA">
+            <option value="No">No — es un pedido nuevo</option>
+            <option value="Si">Sí — ya hubo intercambio previo</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- S2 Preparado -->
+      <div class="sec" data-s="1">
+        <div class="shdr"><div class="snum">2</div><div><div class="stit">Preparado solicitado</div><div class="ssub">Fórmula y especificaciones técnicas</div></div></div>
+
+        <div class="field">
+          <label>Preparado / Fórmula <span class="req">*</span><span class="hint">Buscá por nombre en el Vademecum o escribí la fórmula magistral</span></label>
+          <div class="ac-wrap">
+            <input type="text" id="preparado" placeholder="Ej: Crema AAA, Vaselina azufrada 5%..." autocomplete="off" oninput="prepInput()" onfocus="prepFocus()" onblur="prepBlur()" required>
+            <div class="ac-list" id="prepSug"></div>
+          </div>
+          <div id="prepCard" class="pcard"></div>
+        </div>
+
+        <div class="r2">
+          <div class="field">
+            <label>Cantidad <span class="req">*</span></label>
+            <input type="number" id="cantidad" min="1" placeholder="Ej: 2" required>
+          </div>
+          <div class="field">
+            <label>Presentación <span class="req">*</span></label>
+            <select id="presentacion" required>
+              <option value="">Seleccionar...</option>
+              <option>Unidades</option>
+              <option>Frascos</option>
+              <option>Tubos</option>
+              <option>Potes</option>
+              <option>Cápsulas (caja)</option>
+              <option>Sachets</option>
+            </select>
+            <input type="text" id="presentacionNueva" placeholder="Ej: Frasco 100ml, Pote 50g..." style="display:none;margin-top:0">
+          </div>
+        </div>
+
+        <div class="alert al-b" id="avisoNuevo" style="display:none">
+          <span class="ai">ℹ</span><span>Este preparado no está en el Vademecum. El laboratorio lo evaluará y te confirmará disponibilidad y precio antes de elaborarlo.</span>
+        </div>
+
+        <div class="field">
+          <label id="labelConc">Concentración / Variante<span class="hint">Si aplica — Ej: 5%, 100g, 50ml, etc.</span></label>
+          <input type="text" id="concentracion" placeholder="Ej: 5% · 100g · 2 frascos de 60ml">
+        </div>
+
+        <div class="field">
+          <label>Indicaciones adicionales para el laboratorio<span class="hint">Fórmula magistral específica, variantes, notas del médico</span></label>
+          <textarea id="indicaciones" placeholder="Ej: Con fragancia neutra. Sin conservantes. Para paciente con diabetes — evitar componentes contraindic."></textarea>
+        </div>
+      </div>
+
+      <!-- S3 Presupuesto y entrega -->
+      <div class="sec" data-s="2">
+        <div class="shdr"><div class="snum">3</div><div><div class="stit">Presupuesto y entrega</div><div class="ssub">Urgencia y datos de retiro</div></div></div>
+
+        <div class="field">
+          <label>Urgencia del pedido <span class="req">*</span></label>
+          <div class="og">
+            <label class="oc" onclick="sr(this,'urg','normal')"><input type="radio" name="urg" value="normal"><div><div class="ol">Normal — plazo estándar (3–5 días hábiles)</div></div></label>
+            <label class="oc" onclick="sr(this,'urg','urgente')"><input type="radio" name="urg" value="urgente"><div><div class="ol" style="color:var(--am)">Urgente — necesitado antes del plazo normal</div><div class="os">Confirmar disponibilidad con el laboratorio</div></div></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>¿Quién retira el pedido?</label>
+          <div class="og">
+            <label class="oc" onclick="sr(this,'retira','sucursal');toggleRetiraFields('sucursal')"><input type="radio" name="retira" value="sucursal"><div><div class="ol">Personal de la sucursal</div></div></label>
+            <label class="oc" onclick="sr(this,'retira','cliente');toggleRetiraFields('cliente')"><input type="radio" name="retira" value="cliente"><div><div class="ol">Cliente externo directamente</div></div></label>
+            <label class="oc" onclick="sr(this,'retira','coordinado');toggleRetiraFields('coordinado')"><input type="radio" name="retira" value="coordinado"><div><div class="ol">A coordinar con el laboratorio</div></div></label>
+          </div>
+        </div>
+
+        <div id="retiraFields" style="display:none">
+          <div class="field">
+            <label>Nombre de quien retira <span class="req">*</span></label>
+            <input type="text" id="retiraNombre" placeholder="Nombre completo">
+          </div>
+          <div class="field">
+            <label>DNI de quien retira <span class="req">*</span><span class="hint">Requerido para la entrega</span></label>
+            <input type="text" id="retiraDNI" placeholder="Ej: 30.456.789" inputmode="numeric">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Observaciones adicionales<span class="hint">Cualquier dato relevante para el laboratorio</span></label>
+          <textarea id="obs" placeholder="Ej: El cliente retira el jueves por la tarde. El médico indicó no usar fragancias."></textarea>
+        </div>
+
+        <div class="field">
+          <label>Confirmo que los datos son correctos y completos <span class="req">*</span></label>
+          <label class="oc" id="confCard" onclick="togConf()">
+            <input type="checkbox" id="conf">
+            <div><div class="ol">Confirmo este pedido como responsable</div><div class="os" id="confName">—</div></div>
+          </label>
+        </div>
+      </div>
+
+      <!-- S4 Resumen -->
+      <div class="sec" data-s="3">
+        <div class="shdr"><div class="snum">4</div><div><div class="stit">Resumen del pedido</div><div class="ssub">Revisá antes de enviar</div></div></div>
+        <div id="sumContent"></div>
+      </div>
+
+    </div><!-- /fbody -->
+
+    <div class="succ" id="succScreen">
+      <div class="sico"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="stit2">Pedido registrado</div>
+      <div class="ssub2">El laboratorio recibió el encargo.<br>Te contactarán con el presupuesto.</div>
+      <div class="sid" id="succId"></div>
+      <!-- Banner de sync con B2 -->
+      <div style="margin:12px 0;padding:10px 14px;background:var(--vbg);border:1px solid var(--vb);border-radius:10px;display:flex;align-items:center;gap:10px">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--vmid);flex-shrink:0"></div>
+        <div style="text-align:left">
+          <p style="font-size:11px;font-weight:600;color:var(--verde);margin-bottom:2px">✓ Sincronizado con el tablero del laboratorio</p>
+          <p style="font-size:10px;color:var(--gm)">La tarjeta ya aparece en la columna "Recibido" del Kanban</p>
+        </div>
+      </div>
+      <br>
+      <button class="btn-new" onclick="resetForm()">Nuevo pedido</button>
+      <div style="margin-top:16px;padding:12px;background:var(--abg);border-radius:10px;text-align:left">
+        <p style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:5px">Próximos pasos</p>
+        <p style="font-size:11px;color:var(--gt);line-height:1.7">
+          1. El laboratorio recibe el pedido y evalúa disponibilidad de materias primas.<br>
+          2. Emite el presupuesto y lo comunica a la sucursal.<br>
+          3. La sucursal confirma al cliente y da el OK al laboratorio.<br>
+          4. Se elabora el preparado (plazo estimado en el pedido).<br>
+          5. Laboratorio notifica cuando está listo para retiro.
+        </p>
+      </div>
+    </div>
+
+    <div class="nav" id="navBar">
+      <button class="btn-back" id="btnBack" onclick="goBack()" style="display:none">← Volver</button>
+      <button class="btn-next" id="btnNext" onclick="goNext()">Continuar →</button>
+    </div>
+  </div><!-- /tc-form -->
+
+  <!-- ── TAB HISTORIAL ── -->
+  <div class="tc" id="tc-hist">
+    <div class="hwrap">
+      <div class="hbar">
+        <div class="hcount" id="hCount"></div>
+        <button onclick="clearHist()" style="font-size:11px;color:var(--rojo);background:none;border:1px solid var(--rb);cursor:pointer;padding:4px 8px;border-radius:6px">Borrar todo</button>
+      </div>
+      <div class="hfils">
+        <div class="hfil on" onclick="fh('all',this)">Todos</div>
+        <div class="hfil" onclick="fh('pendiente',this)">Pendientes</div>
+        <div class="hfil" onclick="fh('entregado',this)">Entregados</div>
+      </div>
+      <div id="hList"></div>
+    </div>
+  </div>
+
+  <!-- ── TAB VADEMECUM ── -->
+  <div class="tc" id="tc-vade">
+    <div class="vwrap">
+      <div class="alert al-v"><span class="ai">✓</span><span>Vademecum 2025 — <strong>38 preparados</strong> del laboratorio FullFarma. Tocá cualquier producto para ver la ficha completa.</span></div>
+      <input class="vsearch" type="text" placeholder="Buscar preparado..." oninput="filterVade(this.value)" id="vSearch">
+      <div id="vList"></div>
+    </div>
+  </div>
+</div>
+
+  <!-- ══ TAB KANBAN ══════════════════════════════════════════════════════ -->
+  <div class="tc" id="tc-kanban" style="position:relative;min-height:calc(100vh - 90px)">
+    <!-- PIN overlay -->
+    <div class="kpin-overlay show" id="kpinOverlay">
+      <div class="kpin-logo">
+        <svg viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+      </div>
+      <div class="kpin-title">Tablero del laboratorio</div>
+      <div class="kpin-sub">Solo personal del laboratorio</div>
+      <div class="kpin-dots" id="kpDots">
+        <div class="kpin-dot" id="kd0"></div>
+        <div class="kpin-dot" id="kd1"></div>
+        <div class="kpin-dot" id="kd2"></div>
+        <div class="kpin-dot" id="kd3"></div>
+      </div>
+      <div class="kpin-grid">
+        <button class="kpin-btn" onclick="kpp('1')">1</button>
+        <button class="kpin-btn" onclick="kpp('2')">2</button>
+        <button class="kpin-btn" onclick="kpp('3')">3</button>
+        <button class="kpin-btn" onclick="kpp('4')">4</button>
+        <button class="kpin-btn" onclick="kpp('5')">5</button>
+        <button class="kpin-btn" onclick="kpp('6')">6</button>
+        <button class="kpin-btn" onclick="kpp('7')">7</button>
+        <button class="kpin-btn" onclick="kpp('8')">8</button>
+        <button class="kpin-btn" onclick="kpp('9')">9</button>
+        <button class="kpin-btn empty"></button>
+        <button class="kpin-btn" onclick="kpp('0')">0</button>
+        <button class="kpin-btn del" onclick="kpd()">⌫</button>
+      </div>
+      <div class="kpin-err" id="kpErr"></div>
+      <div style="font-size:10px;color:var(--gm);margin-top:16px;text-align:center">PIN demo: 1234</div>
+    </div>
+    <!-- Contenido del tablero (oculto hasta ingresar PIN) -->
+    <div id="kanbanContent" style="display:none">
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<div class="header">
+  <div class="header-brand">
+    <div class="hlogo">
+      <svg viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+    </div>
+    <div>
+      <h1>Pedidos — Laboratorio FullFarma</h1>
+      <p id="headerSub">Cargando...</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="badge-total" id="badgeTotal"></span>
+    <button class="btn-add" onclick="openForm()">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nuevo pedido
+    </button>
+  </div>
+</div>
+
+<!-- ── INTEGRATION BANNER ── -->
+<div class="int-banner" id="b1Banner">
+  <div class="int-dot"></div>
+  <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+  <span id="b1BannerTxt">Integración con B1 activa: los pedidos del formulario de sucursales aparecen aquí automáticamente · Última sincronización: hace 2 min</span>
+</div>
+
+<!-- ── FILTROS ── -->
+<div class="filter-bar">
+  <button class="filter-btn on" onclick="setFilter('all',this)">Todos</button>
+  <button class="filter-btn" onclick="setFilter('urgente',this)">🔴 Urgentes</button>
+  <div class="filter-sep"></div>
+  <button class="filter-btn" onclick="setFilter('Central Guernica',this)">Guernica</button>
+  <button class="filter-btn" onclick="setFilter('Central Numancia',this)">Numancia</button>
+  <button class="filter-btn" onclick="setFilter('Fullfarma Nueva',this)">Nueva</button>
+  <button class="filter-btn" onclick="setFilter('Fullfarma Berlin',this)">Berlin</button>
+  <button class="filter-btn" onclick="setFilter('Fullfarma Glew',this)">Glew</button>
+  <button class="filter-btn" onclick="setFilter('Fullfarma Rivadavia',this)">Rivadavia</button>
+  <div class="filter-sep"></div>
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="searchInput" placeholder="Buscar preparado..." oninput="renderBoard()">
+  </div>
+</div>
+
+<!-- ── BOARD ── -->
+<div class="board" id="board"></div>
+
+<!-- ── MODAL DETALLE ── -->
+<div class="modal-bg" id="detailBg" onclick="closeDetail(event)">
+  <div class="modal" id="detailModal">
+    <div class="modal-hdr">
+      <h2 id="dTitle">—</h2>
+      <button class="modal-close" onclick="closeDetailDirect()">×</button>
+    </div>
+    <div class="modal-body" id="dBody"></div>
+    <div class="modal-footer">
+      <button class="btn-del" onclick="deleteCard()">Eliminar</button>
+      <button class="btn-save" onclick="saveDetail()">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── FORM NUEVO PEDIDO ── -->
+<div class="form-modal" id="formModal" onclick="closeForm(event)">
+  <div class="form-box">
+    <div class="form-title">Nuevo pedido manual</div>
+    <div class="field">
+      <label>Preparado / Fórmula <span class="req">*</span></label>
+      <input type="text" id="f-prep" placeholder="Ej: Crema AAA, Vaselina azufrada 5%...">
+    </div>
+    <div class="row-2">
+      <div class="field">
+        <label>Sucursal <span class="req">*</span></label>
+        <select id="f-suc">
+          <option value="">Seleccionar...</option>
+          <option>Central Guernica</option>
+          <option>Central Numancia</option>
+          <option>Fullfarma Nueva</option>
+          <option>Fullfarma Berlin</option>
+          <option>Fullfarma Glew</option>
+          <option>Fullfarma Rivadavia</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Urgencia</label>
+        <select id="f-urg">
+          <option value="normal">Normal</option>
+          <option value="urgente">Urgente</option>
+        </select>
+      </div>
+    </div>
+    <div class="row-2">
+      <div class="field">
+        <label>Cantidad</label>
+        <input type="text" id="f-cant" placeholder="Ej: 2 unidades">
+      </div>
+      <div class="field">
+        <label>Concentración</label>
+        <input type="text" id="f-conc" placeholder="Ej: 5%, 50g">
+      </div>
+    </div>
+    <div class="field">
+      <label>Encargado por</label>
+      <input type="text" id="f-emp" placeholder="Nombre del empleado que pide">
+    </div>
+    <div class="field">
+      <label>Observaciones</label>
+      <textarea id="f-obs" placeholder="Indicaciones especiales, notas del médico..."></textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeFormDirect()">Cancelar</button>
+      <button class="btn-create" onclick="createCard()">Crear tarjeta</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast"></div>
+    </div>
+  </div>
+
+<!-- ── MODAL CÓDIGO DE SEGURIDAD ── -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal-box">
+    <div class="modal-title" id="modalTitle">Código de laboratorio</div>
+    <div class="modal-sub" id="modalSub">Ingresá el código para confirmar</div>
+    <div class="modal-dots" id="modalDots">
+      <div class="modal-dot" id="md0"></div>
+      <div class="modal-dot" id="md1"></div>
+      <div class="modal-dot" id="md2"></div>
+      <div class="modal-dot" id="md3"></div>
+    </div>
+    <div class="modal-grid">
+      <button class="modal-btn" onclick="mPress('1')">1</button>
+      <button class="modal-btn" onclick="mPress('2')">2</button>
+      <button class="modal-btn" onclick="mPress('3')">3</button>
+      <button class="modal-btn" onclick="mPress('4')">4</button>
+      <button class="modal-btn" onclick="mPress('5')">5</button>
+      <button class="modal-btn" onclick="mPress('6')">6</button>
+      <button class="modal-btn" onclick="mPress('7')">7</button>
+      <button class="modal-btn" onclick="mPress('8')">8</button>
+      <button class="modal-btn" onclick="mPress('9')">9</button>
+      <button class="modal-btn empty"></button>
+      <button class="modal-btn" onclick="mPress('0')">0</button>
+      <button class="modal-btn del" onclick="mDel()">⌫</button>
+    </div>
+    <div class="modal-err" id="modalErr"></div>
+    <button class="modal-cancel" onclick="mCancel()">Cancelar</button>
+  </div>
+</div>
+
+<script>
+const PIN = '1234';
+const ADMIN_CODE = '9876'; // código para cambiar estado y borrar — cambiar en producción
+const REC_KEY = 'ff_pedidos_v1';
+const EMP_KEY = 'ff_emp_v1';
+const STEPS = 4;
+const SNAMES = ['Datos del pedido','Preparado','Entrega','Resumen'];
+let cur = 0, pinBuf = '';
+// ── modal state
+let mBuf = '', mAction = null, mPayload = null;
+
+// ── VADEMECUM DATA ────────────────────────────────────────────────────────
+const VADE = [
+  {n:'Champú Anticaspa',cat:'Higiene',comp:'Ketoconazole 1%',acc:'Anticaspa',pos:'Lavar, dejar actuar y enjuagar',contra:'Alérgicos a los componentes',pres:'120 ml',venc:'6 meses'},
+  {n:'Cápsulas Benzopirona + Escina',cat:'Circulación',comp:'Benzopirona 30mg, Escina 20mg, Rutina 200mg, Furosemida 25mg',acc:'Flebotónico, diurético',pos:'1 cápsula diaria',contra:'Alérgicos a los componentes',pres:'Cápsulas',venc:'6 meses'},
+  {n:'Crema Vit. A y Triamcinolona',cat:'Piel',comp:'Vitamina A 100.000 UI, Triamcinolona 0,1g, Glicerina, Crema base 100g',acc:'Antialérgica y reparadora de la piel',pos:'Aplicar 2 veces por día',contra:'Alérgicos, diabéticos',simil:'Bagovit A Plus',pres:'50 g',venc:'6 meses'},
+  {n:'Magnesio Citrato Cápsulas',cat:'Suplementos',comp:'Magnesio Citrato 300mg',acc:'Suplemento. Favorece huesos, músculos, reduce estrés e insomnio',pos:'1 cápsula diaria',contra:'Alérgicos a los componentes',pres:'Cápsulas',venc:'6 meses'},
+  {n:'Pediculicida Plus Crema Enjuague',cat:'Antipiojos',comp:'Ivermectina 1%, Crema de enjuague 100ml',acc:'Pediculicida',pos:'Lavar, secar, aplicar 15 min, peine fino, enjuagar',contra:'Alérgicos, menores de 5 años',pres:'100 ml',venc:'6 meses'},
+  {n:'Pediculicida',cat:'Antipiojos',comp:'Ipermetrina 1%, Crema de enjuague 100ml',acc:'Pediculicida',pos:'Lavar, secar, aplicar 15 min, peine fino, enjuagar',contra:'Alérgicos, menores de 2 años',simil:'Kinderval',pres:'100 ml',venc:'6 meses'},
+  {n:'Gotas Hepáticas',cat:'Digestivo',comp:'Ext. Alcachofas 25%, Ext. Boldo 20%, Ext. Carqueja 10%, T. Beleño 5%, T. Belladona 5%',acc:'Digestivo, colerético, colagogo',pos:'30 gotas en agua antes/durante/después de comidas',contra:'Alérgicos, menores de 6 años, hepatopatía grave',simil:'Hepatalgina',pres:'60 ml / 100 ml',venc:'6 meses'},
+  {n:'Cápsulas Arándanos + Vit. C',cat:'Suplementos',comp:'Ext. seco arándanos 400mg, Vit C 300mg',acc:'Antiinflamatorio urinario, profilaxis de infecciones urinarias',pos:'2 cápsulas diarias',contra:'Alérgicos a los componentes',pres:'Cápsulas',venc:'6 meses'},
+  {n:'Acné Loción',cat:'Dermatología',comp:'Ac. Salicílico 1%, Resorcina 2%, Cloranfenicol 0,5%',acc:'Antiacneico, antibacteriano, antiseborreico, queratolítico',pos:'Aplicar a la noche tras limpieza',contra:'Alérgicos, diabéticos',simil:'Acnoxin',pres:'100 ml',venc:'6 meses'},
+  {n:'Talco Antimicótico',cat:'Antimicóticos',comp:'Clotrimazole 1g, Excipiente csp 100g',acc:'Antimicótico de uso externo',pos:'Espolvorear en zona afectada 1–2 veces',pres:'50 g',venc:'1 año'},
+  {n:'Iodopovidona Solución',cat:'Antisépticos',comp:'Iodopovidona solución al 10%',acc:'Antiséptico de piel de uso general',pos:'Aplicar 2–3 veces al día',contra:'Trastornos tiroideos, menores de 5 años',simil:'Pervinox',pres:'60 ml / 100 ml',venc:'1 año'},
+  {n:'Crema Ungueal',cat:'Antimicóticos',comp:'Bifonazol 1%, Ungüento 20g, Urea 30%',acc:'Antimicótico de uso tópico',pos:'Aplicar sobre la uña afectada',contra:'Alérgicos, menores de 12 años, diabéticos',simil:'Unesia',pres:'20 g',venc:'1 año'},
+  {n:'Nafazolina Gotas',cat:'Respiratorio',comp:'Nafazolina Clorhidrato 0,1g',acc:'Descongestivo nasal',pos:'Adultos y >12 años: 2 gotas cada 12 hs',contra:'Niños, rinitis atrófica, embarazo y lactancia',simil:'Rhinal / Nafazolex',pres:'100 ml',venc:'6 meses'},
+  {n:'Pomada Callicida',cat:'Dermatología',comp:'Ac. Salicílico, Ac. Acético, Ac. Láctico, Lanolina',acc:'Callicida',pos:'Aplicar sobre la lesión',contra:'Alérgicos, diabéticos, anticoagulados',pres:'20 g',venc:'1 año'},
+  {n:'Pomada Sabañones',cat:'Circulación',comp:'Ictiol 5%, Mentol 1%, Alcanfor 1%',acc:'Tratamiento de sabañones',pos:'Aplicar 2 veces por día',contra:'Alérgicos a los componentes',pres:'20 g',venc:'1 año'},
+  {n:'Vaselina Salicilada',cat:'Dermatología',comp:'Ac. Salicílico 10%, Vaselina sólida csp 100g',acc:'Queratolítico — ictiosis, psoriasis, hiperqueratosis',pos:'Aplicar 2–3 veces por día',contra:'Alérgicos, diabéticos, alt. circulación periférica',pres:'100 g',venc:'1 año'},
+  {n:'Diclofenac Gel',cat:'Antiinflamatorios',comp:'Diclofenac Dietilamina 1,2%, Ext. Fl. Arnica 8%, Gel csp',acc:'Antiinflamatorio y analgésico localizado',pos:'Aplicar las veces necesarias',contra:'Alérgicos a los componentes',simil:'Diclofenac gel',pres:'50 g / 100 g',venc:'6 meses'},
+  {n:'Crema de Borato de Sodio 3%',cat:'Ginecología',comp:'Borato de Sodio 3%, Crema base csp 100g',acc:'Para cándida vaginal, equilibrio de pH',contra:'Alérgicos a los componentes',pres:'25 g',venc:'6 meses'},
+  {n:'Glicerina Pura',cat:'Dermatología',comp:'Glicerina pura',acc:'Humectante',pres:'Frasco',venc:'1 año'},
+  {n:'Vaselina Azufrada',cat:'Antiparasitarios',comp:'Azufre PP (2%/3%/5%/6%), Vaselina sólida csp 100g',acc:'Ectoparasiticida',pos:'Según indicación médica',contra:'Alérgicos a los componentes',pres:'100 g',venc:'1 año',nota:'Disponible en 2%, 3%, 5% y 6%. Indicar concentración.'},
+  {n:'Solución Jabonosa Iodopovidona 5%',cat:'Antisépticos',comp:'Solución jabonosa iodopovidona 5%',acc:'Jabón antiséptico',pos:'Frotar 2–5 min, espuma, enjuagar',contra:'Alergia al sistema',simil:'Pervinox',pres:'100 ml',venc:'1 año'},
+  {n:'Azufre en Polvo',cat:'Dermatología',comp:'Azufre en polvo 25g',acc:'Según criterio médico',pres:'25 g',venc:'1 año'},
+  {n:'Glucosa Anhidra',cat:'Diagnóstico',comp:'Glucosa Anhidra 75g',pos:'Según indicación médica',contra:'Diabéticos',pres:'75 g',venc:'6 meses'},
+  {n:'Pasta Bebé Plus',cat:'Pediatría',comp:'Vit A 1.000.000 UI, Ac. Hígado de Bacalao 2%, Ac. Bórico 2%, Pasta base csp 100g',acc:'Cicatrizante y regeneradora de tejidos',pos:'Aplicar en capa gruesa tras limpiar',contra:'Alérgicos a los componentes',simil:'Hipoglós',pres:'60 g',venc:'1 año'},
+  {n:'Vitamina A Crema (tipo Bagovit)',cat:'Piel',comp:'Vitamina A Palmitato 100.000 UI, Crema base csp 100g',acc:'Nutritiva, protectora y regeneradora de la piel',pos:'Aplicar las veces necesarias',contra:'Alérgicos a los componentes',simil:'Bagovit',pres:'100 g',venc:'6 meses'},
+  {n:'Crema Vit. A + Vit. E (tipo Dermaglós)',cat:'Piel',comp:'Vitamina A 600.000 UI, Alantoína 0,25g, Vit E 0,05g, Crema base csp 100g',acc:'Protectora y regeneradora de la piel',pos:'Aplicar las veces necesarias',contra:'Alérgicos a los componentes',simil:'Dermaglós / Factor Ae',pres:'100 g',venc:'6 meses'},
+  {n:'Crema para Talones',cat:'Piel',comp:'Aloe Vera Ext Glic 10%, Vit A Palmit 10.000 UI, Lanolina 10%, Crema csp 100g',acc:'Hidratante y regeneradora de talones resecos',pos:'Aplicar tras higiene, las veces necesarias',contra:'Alérgicos a los componentes',pres:'50 g',venc:'6 meses'},
+  {n:'Crema para Manos Agrietadas',cat:'Piel',comp:'Urea 10%, Vit A 50.000 UI, Lanolina 10%, Miristato de Isopropilo 10%, Crema csp 50g',acc:'Hidratante y regeneradora',pos:'Aplicar las veces necesarias',contra:'Alérgicos a los componentes',pres:'50 g',venc:'6 meses'},
+  {n:'Crema Facial Anti Age',cat:'Cosmética',comp:'Aloe Vera Ext Glic 10%, Vit A Palmit 10.000 UI, Lanolina 10%, Crema csp 100g',acc:'Indicada para arrugas y líneas de expresión',pos:'Aplicar todas las noches tras limpieza facial',contra:'Alérgicos a los componentes',pres:'25 g',venc:'6 meses'},
+  {n:'Aftas (Pomada mucoadhesiva)',cat:'Bucal',comp:'Triamcinolona 0,1%, Lidocaína 5%, Oro base csp 100g',acc:'Pomada mucoadhesiva para aftas',pos:'Aplicar 3 veces por día',contra:'Niños, diabéticos, alérgicos',pres:'20 g',venc:'1 año'},
+  {n:'Crema Antimicótica',cat:'Antimicóticos',comp:'Ketoconazol 2%, Crema base csp 100g',acc:'Crema antimicótica',pos:'Aplicar 2 veces por día',contra:'Alérgicos a los componentes',pres:'50 g',venc:'6 meses'},
+  {n:'Crema AAA',cat:'Dermatología',comp:'Betametasona Val 0,1%, Gentamicina Base 0,1%, Clotrimazole 1%, Crema base csp 100g',acc:'Antimicótica, antibiótica y antialérgica',pos:'Aplicar 2 veces por día',contra:'Alérgicos, diabéticos',simil:'Macril / Vitacortil / Dermosona',pres:'25 g / 100 g',venc:'6 meses'},
+  {n:'Clorhexidina 2%/4% Solución',cat:'Antisépticos',comp:'Clorhexidina c.s., Alcohol, Sol. hidroalcohólica csp',acc:'Antiséptico y desinfectante',pos:'Limpiar herida, aplicar 1–2 veces al día',contra:'Hipersensibilidad al ppacio activo. No usar en ojos, oídos ni mucosas',simil:'Pervinox Antiséptico',pres:'4% sol x200ml / 2% spray x50ml',venc:'1 año',nota:'Disponible en 2% (spray) y 4% (solución). Indicar concentración.'},
+  {n:'Cápsulas Anticelulíticas',cat:'Cosmética',comp:'Ext. Seco Centella Asiática 100mg, Carnitina 150mg, Cafeína 50mg',acc:'Activa circulación, acelera metabolismo de grasas',pos:'2 cápsulas diarias (1 al mediodía, 1 a la tarde)',contra:'Alérgicos, hipertensos',pres:'Cápsulas',venc:'6 meses'},
+  {n:'Cápsulas Ginkgo Biloba + Ajo + Zinc',cat:'Suplementos',comp:'Ginkgo Biloba 60mg, Ext. Seco Ajo 50mg, Zinc 10mg',acc:'Suplemento antioxidante. Mejora circulación cerebral y arterial',pos:'1 cápsula diaria',contra:'Alérgicos a los componentes',pres:'Cápsulas',venc:'6 meses'},
+  {n:'Crema para Escaras',cat:'Heridas',comp:'Ac. Hialurónico 0,5%, Ácidos Grasos Esenciales (AGE) 15%, Crema base csp 100g',acc:'Cicatrizante y epitelizante',pos:'Aplicar 2–3 veces por día',contra:'Alérgicos a los componentes',pres:'50 g',venc:'6 meses'},
+  {n:'Cápsulas Complejo Vit. B',cat:'Suplementos',comp:'Vit B1 (Tiamina) 15mg, Vit B6 (Piridoxina) 15mg, Vit B12 (Cianocobalamina) 15ug',acc:'Prevención y tratamiento de deficiencias del complejo B',pos:'1–2 cápsulas diarias',contra:'Hipersensibilidad a los componentes',pres:'Cápsulas',venc:'6 meses'},
+  {n:'Gotas Laxantes',cat:'Digestivo',comp:'Picosulfato de Sodio 0,75g, Solución oral csp 100ml',acc:'Laxante',pos:'Adultos: 15–30 gotas al acostarse. Niños: 5–15 gotas.',contra:'Alérgicos, apendicitis, oclusión intestinal',pres:'20 ml',venc:'6 meses'},
+  {n:'Ginkgo Biloba Cápsulas',cat:'Suplementos',comp:'Ginkgo Biloba 80mg',acc:'Neurotónico cerebral',pos:'1 cápsula diaria',contra:'Alérgicos a los componentes',pres:'Cápsulas',venc:'6 meses'},
+];
+
+// ── PIN ────────────────────────────────────────────────────────────────────
+function pp(d){
+  if(pinBuf.length>=4) return;
+  pinBuf+=d; rpd(false);
+  if(pinBuf.length===4){
+    setTimeout(()=>{
+      if(pinBuf===PIN){
+        document.getElementById('pinScreen').style.display='none';
+        document.getElementById('app').classList.add('on');
+        init();
+      } else {
+        rpd(true); document.getElementById('pErr').textContent='PIN incorrecto. Intentá de nuevo.';
+        setTimeout(()=>{pinBuf='';rpd(false);document.getElementById('pErr').textContent='';},900);
+      }
+    },120);
+  }
+}
+function pd(){pinBuf=pinBuf.slice(0,-1);rpd(false);}
+function rpd(w){for(let i=0;i<4;i++){const d=document.getElementById('d'+i);d.className='pin-dot'+(i<pinBuf.length?(w?' wrong':' filled'):'');}}
+function logout(){pinBuf='';rpd(false);document.getElementById('app').classList.remove('on');document.getElementById('pinScreen').style.display='flex';document.getElementById('pErr').textContent='';}
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+function init(){
+  const now=new Date();
+  document.getElementById('fecha').value=now.toISOString().split('T')[0];
+  rp(); showSec(0);
+  renderHist('all'); renderVade('');
+}
+
+// ── TABS ───────────────────────────────────────────────────────────────────
+function st(name){
+  if(name==='kanban' && !kpUnlocked){ document.getElementById('kpinOverlay').classList.add('show'); }
+  ['form','hist','vade','kanban'].forEach(t=>{
+    document.getElementById('t-'+t).classList.toggle('on',t===name);
+    document.getElementById('tc-'+t).classList.toggle('on',t===name);
+  });
+  const nb=document.getElementById('navBar');
+  const pw=document.getElementById('progWrap');
+  if(nb) nb.style.display=name==='form'?'flex':'none';
+  if(pw) pw.style.display=name==='form'?'block':'none';
+  if(name==='hist') renderHist(curF||'all');
+  if(name==='vade') document.getElementById('vSearch').value='';
+  if(name==='kanban' && kpUnlocked){ renderBoard(); updateB1Banner(); }
+}
+
+// ── PROGRESS ──────────────────────────────────────────────────────────────
+function rp(){
+  const dots=document.getElementById('progDots'); dots.innerHTML='';
+  for(let i=0;i<STEPS;i++){
+    const d=document.createElement('div');
+    d.className='pd'+(i<cur?' done':i===cur?' on':'');
+    dots.appendChild(d);
+    if(i<STEPS-1){const s=document.createElement('div');s.style.cssText='flex:1;height:2px;background:'+(i<cur?'var(--verde)':'var(--gb)');dots.appendChild(s);}
+  }
+  document.getElementById('progLbl').innerHTML=`<span>Paso ${cur+1} de ${STEPS}</span> — ${SNAMES[cur]}`;
+}
+function showSec(idx){
+  document.querySelectorAll('.sec').forEach((s,i)=>s.classList.toggle('on',i===idx));
+  const back=document.getElementById('btnBack'),next=document.getElementById('btnNext');
+  back.style.display=idx>0?'block':'none';
+  if(idx===STEPS-1){next.textContent='Enviar pedido ✓';next.className='btn-sub';next.onclick=submitForm;}
+  else{next.textContent='Continuar →';next.className='btn-next';next.onclick=goNext;}
+  window.scrollTo(0,0);
+}
+function goNext(){if(!val(cur))return;if(cur===STEPS-2)buildSum();cur++;rp();showSec(cur);}
+function goBack(){if(cur>0){cur--;rp();showSec(cur);}}
+
+// ── VALIDATION ────────────────────────────────────────────────────────────
+function g(id){return document.getElementById(id)?.value||'';}
+function val(idx){
+  if(idx===0){
+    if(!g('sucursal')){toast('Seleccioná la sucursal');return false;}
+    if(!g('encargado').trim()){toast('Ingresá el nombre del encargado');return false;}
+    if(!g('receta')){toast('Indicá si tiene receta');return false;}
+    saveEmp(g('encargado').trim());
+  }
+  if(idx===1){
+    if(!g('preparado').trim()){toast('Indicá el preparado solicitado');return false;}
+    if(!g('cantidad')){toast('Indicá la cantidad');return false;}
+    if(prepEsNuevo){
+      if(!g('presentacionNueva').trim()){toast('Indicá la presentación del nuevo preparado');return false;}
+      if(!g('concentracion').trim()){toast('Indicá la concentración o variante');return false;}
+    } else {
+      if(!g('presentacion')){toast('Seleccioná la presentación');return false;}
+    }
+  }
+  if(idx===2){
+    if(!document.querySelector('[name=urg]:checked')){toast('Seleccioná la urgencia');return false;}
+    if(!document.getElementById('conf').checked){toast('Confirmá el pedido para continuar');return false;}
+    document.getElementById('confName').textContent=g('encargado')||'—';
+  }
+  return true;
+}
+
+// ── RADIO CARDS ───────────────────────────────────────────────────────────
+function sr(card,name,val){
+  document.querySelectorAll(`[name="${name}"]`).forEach(r=>{
+    const p=r.closest('.oc');if(p)p.classList.remove('sv','sam');
+  });
+  const r=card.querySelector('input[type=radio]');if(r)r.checked=true;
+  card.classList.add(['normal','sucursal','coordinado'].includes(val)?'sv':'sam');
+}
+function toggleRetiraFields(val){
+  const show = (val==='sucursal'||val==='cliente');
+  const fields=document.getElementById('retiraFields');
+  fields.style.display=show?'block':'none';
+  document.getElementById('retiraNombre').required=show;
+  document.getElementById('retiraDNI').required=show;
+  if(!show){document.getElementById('retiraNombre').value='';document.getElementById('retiraDNI').value='';}
+}
+function togConf(){
+  const cb=document.getElementById('conf');cb.checked=!cb.checked;
+  document.getElementById('confCard').classList.toggle('sv',cb.checked);
+}
+
+// ── EMPLOYEE MEMORY ────────────────────────────────────────────────────────
+function getEmps(){try{return JSON.parse(localStorage.getItem(EMP_KEY)||'[]');}catch{return[];}}
+function saveEmp(n){if(!n)return;let e=getEmps().filter(x=>x.toLowerCase()!==n.toLowerCase());e.unshift(n);localStorage.setItem(EMP_KEY,JSON.stringify(e.slice(0,15)));}
+function empInput(){const v=g('encargado').toLowerCase();renderEmpSug(getEmps().filter(e=>e.toLowerCase().includes(v)&&e.toLowerCase()!==v),v);}
+function empFocus(){renderEmpSug(getEmps(),'');}
+function empBlur(){setTimeout(()=>{const s=document.getElementById('empSug');if(s)s.style.display='none';},200);}
+function renderEmpSug(emps,typed){
+  const sug=document.getElementById('empSug');sug.innerHTML='';
+  if(emps.length===0&&!typed){sug.style.display='none';return;}
+  emps.forEach(e=>{const it=document.createElement('div');it.className='ac-item';it.textContent=e;it.onmousedown=()=>{document.getElementById('encargado').value=e;sug.style.display='none';};sug.appendChild(it);});
+  if(typed&&typed.length>1){
+    const cap=typed.charAt(0).toUpperCase()+typed.slice(1);
+    const ex=emps.some(e=>e.toLowerCase()===typed);
+    if(!ex){const it=document.createElement('div');it.className='ac-item';it.style.color='var(--azul)';it.style.fontWeight='500';it.textContent='➕ Guardar "'+cap+'" como nuevo';it.onmousedown=()=>{document.getElementById('encargado').value=cap;saveEmp(cap);sug.style.display='none';};sug.appendChild(it);}
+  }
+  sug.style.display=sug.children.length>0?'block':'none';
+}
+
+// ── PREPARADO AUTOCOMPLETE ─────────────────────────────────────────────────
+let prepEsNuevo = false; // flag: true cuando el usuario eligió "Crear nuevo"
+
+function prepInput(){
+  const v=g('preparado').toLowerCase().trim();
+  prepEsNuevo=false;
+  toggleCamposNuevo(false);
+  hidePrepCard();
+  if(v.length<1){document.getElementById('prepSug').style.display='none';return;}
+  renderPrepSug(v);
+}
+function prepFocus(){const v=g('preparado').toLowerCase().trim();if(v.length>=1)renderPrepSug(v);}
+function prepBlur(){setTimeout(()=>{document.getElementById('prepSug').style.display='none';},200);}
+
+function scoreMatch(p, v){
+  const n=p.n.toLowerCase();
+  if(n.startsWith(v)) return 10;
+  const words=n.split(/[\s\+\/\-]+/);
+  if(words.some(w=>w.startsWith(v))) return 8;
+  if(n.includes(v)) return 6;
+  if((p.cat||'').toLowerCase().includes(v)) return 3;
+  if((p.acc||'').toLowerCase().includes(v)) return 2;
+  if((p.comp||'').toLowerCase().includes(v)) return 1;
+  return 0;
+}
+
+function renderPrepSug(typed){
+  const v=typed.toLowerCase().trim();
+  const sug=document.getElementById('prepSug');sug.innerHTML='';
+
+  const scored=VADE
+    .map(p=>({p, score:scoreMatch(p,v)}))
+    .filter(x=>x.score>0)
+    .sort((a,b)=>b.score-a.score || a.p.n.localeCompare(b.p.n,'es'));
+
+  if(scored.length){
+    const ch=document.createElement('div');ch.className='ac-cat';ch.textContent='En el Vademecum';sug.appendChild(ch);
+    scored.forEach(({p})=>{
+      const it=document.createElement('div');it.className='ac-item';
+      const re=new RegExp('('+v.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+      const nameHL=p.n.replace(re,'<mark style="background:#FFF176;border-radius:2px;padding:0 1px">$1</mark>');
+      it.innerHTML=`<strong style="font-size:13px">${nameHL}</strong><br><span style="font-size:11px;color:var(--gm)">${p.acc||''} · ${p.pres||''}</span>`;
+      it.onmousedown=()=>{
+        document.getElementById('preparado').value=p.n;
+        sug.style.display='none';
+        prepEsNuevo=false;
+        toggleCamposNuevo(false);
+        showPrepCard(p);
+      };
+      sug.appendChild(it);
+    });
+  }
+
+  if(typed.length>1){
+    const sep=document.createElement('div');sep.className='ac-cat';sep.textContent='No está en el Vademecum';sug.appendChild(sep);
+    const it=document.createElement('div');it.className='ac-item';
+    it.style.cssText='color:var(--azul);font-weight:500;display:flex;align-items:center;gap:8px';
+    it.innerHTML=`<span style="font-size:16px">✚</span><div><strong style="font-size:13px">Crear pedido para "${typed}"</strong><br><span style="font-size:11px;color:var(--gm);font-weight:400">Indicá presentación y concentración manualmente</span></div>`;
+    it.onmousedown=()=>{
+      document.getElementById('preparado').value=typed.charAt(0).toUpperCase()+typed.slice(1);
+      sug.style.display='none';
+      prepEsNuevo=true;
+      hidePrepCard();
+      toggleCamposNuevo(true);
+    };
+    sug.appendChild(it);
+  }
+  sug.style.display=sug.children.length>0?'block':'none';
+}
+
+function hidePrepCard(){
+  const card=document.getElementById('prepCard');
+  card.classList.remove('on');card.innerHTML='';
+}
+
+function toggleCamposNuevo(show){
+  // Cuando es nuevo: presentacion pasa a texto libre, concentracion queda igual
+  const selPres=document.getElementById('presentacion');
+  const inputPresNuevo=document.getElementById('presentacionNueva');
+  const labelConc=document.getElementById('labelConc');
+  if(show){
+    selPres.style.display='none';
+    inputPresNuevo.style.display='block';
+    labelConc.textContent='Concentración / Variante *';
+    inputPresNuevo.required=true; selPres.required=false;
+    // Mostrar aviso
+    document.getElementById('avisoNuevo').style.display='block';
+  } else {
+    selPres.style.display='block';
+    inputPresNuevo.style.display='none';
+    inputPresNuevo.value='';
+    labelConc.textContent='Concentración / Variante';
+    selPres.required=true; inputPresNuevo.required=false;
+    document.getElementById('avisoNuevo').style.display='none';
+  }
+}
+function showPrepCard(p){
+  const card=document.getElementById('prepCard');
+  let html=`<div class="pcard-name">${p.n}</div>`;
+  html+=`<div class="pcard-row"><span class="pcard-key">Composición</span><span class="pcard-val">${p.comp||'—'}</span></div>`;
+  if(p.acc) html+=`<div class="pcard-row"><span class="pcard-key">Acción terapéutica</span><span class="pcard-val">${p.acc}</span></div>`;
+  if(p.pos) html+=`<div class="pcard-row"><span class="pcard-key">Posología</span><span class="pcard-val">${p.pos}</span></div>`;
+  if(p.pres) html+=`<div class="pcard-row"><span class="pcard-key">Presentación</span><span class="pcard-val">${p.pres}</span></div>`;
+  if(p.venc) html+=`<div class="pcard-row"><span class="pcard-key">Vencimiento</span><span class="pcard-val">${p.venc}</span></div>`;
+  if(p.simil) html+=`<div class="pcard-row"><span class="pcard-key">Símil comercial</span><span class="pcard-val">${p.simil}</span></div>`;
+  if(p.contra) html+=`<div class="pcard-warn">⚠ Contraindicado en: ${p.contra}</div>`;
+  if(p.nota) html+=`<div class="pcard-warn" style="background:var(--abg);color:var(--azul);border-color:var(--ab)">ℹ ${p.nota}</div>`;
+  card.innerHTML=html; card.classList.add('on');
+}
+
+// ── SUMMARY ────────────────────────────────────────────────────────────────
+function buildSum(){
+  const rv=name=>document.querySelector(`[name="${name}"]:checked`)?.value||'—';
+  document.getElementById('confName').textContent=g('encargado')||'—';
+  document.getElementById('sumContent').innerHTML=`
+    <div class="scard"><div class="schdr">Datos del pedido</div>
+      <div class="srow"><span class="sk">Sucursal</span><span class="sv2">${g('sucursal')}</span></div>
+      <div class="srow"><span class="sk">Encargado por</span><span class="sv2">${g('encargado')}</span></div>
+      <div class="srow"><span class="sk">Fecha</span><span class="sv2">${g('fecha')}</span></div>
+      <div class="srow"><span class="sk">Tiene receta</span><span class="sv2">${g('receta')}</span></div>
+      <div class="srow"><span class="sk">WhatsApp previo</span><span class="sv2">${g('tieneWA')}</span></div>
+    </div>
+    <div class="scard"><div class="schdr">Preparado</div>
+      <div class="srow"><span class="sk">Preparado</span><span class="sv2">${g('preparado')}${prepEsNuevo?' <span style="font-size:10px;background:var(--ambg);color:var(--am);padding:1px 6px;border-radius:10px;font-weight:600">Nuevo</span>':''}</span></div>
+      <div class="srow"><span class="sk">Cantidad</span><span class="sv2">${g('cantidad')} ${prepEsNuevo?g('presentacionNueva'):g('presentacion')}</span></div>
+      ${g('concentracion')?`<div class="srow"><span class="sk">Concentración</span><span class="sv2">${g('concentracion')}</span></div>`:''}
+      ${g('indicaciones')?`<div class="srow"><span class="sk">Indicaciones</span><span class="sv2" style="font-style:italic">${g('indicaciones')}</span></div>`:''}
+    </div>
+    <div class="scard"><div class="schdr">Entrega</div>
+      <div class="srow"><span class="sk">Urgencia</span><span class="sv2">${rv('urg')==='urgente'?'⚠ Urgente':'Normal'}</span></div>
+      <div class="srow"><span class="sk">Retira</span><span class="sv2">${rv('retira')||'—'}</span></div>
+      ${g('retiraNombre')?`<div class="srow"><span class="sk">Nombre retira</span><span class="sv2">${g('retiraNombre')}</span></div>`:''}
+      ${g('retiraDNI')?`<div class="srow"><span class="sk">DNI retira</span><span class="sv2">${g('retiraDNI')}</span></div>`:''}
+      ${g('obs')?`<div class="srow"><span class="sk">Observaciones</span><span class="sv2" style="font-style:italic">${g('obs')}</span></div>`:''}
+    </div>`;
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────────────────
+function submitForm(){
+  const now=new Date();
+  const id='PED-'+now.getFullYear()+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+'-'+String(Math.floor(Math.random()*9000)+1000);
+  const rv=name=>document.querySelector(`[name="${name}"]:checked`)?.value||'—';
+  const rec={
+    id,ts:now.toISOString(),estado:'pendiente',
+    sucursal:g('sucursal'),encargado:g('encargado'),fecha:g('fecha'),
+    receta:g('receta'),tieneWA:g('tieneWA'),
+    preparado:g('preparado'),esNuevo:prepEsNuevo,
+    cantidad:g('cantidad'),
+    presentacion:prepEsNuevo?g('presentacionNueva'):g('presentacion'),
+    concentracion:g('concentracion'),indicaciones:g('indicaciones'),
+    urgencia:rv('urg'),retira:rv('retira'),
+    retiraNombre:g('retiraNombre'),retiraDNI:g('retiraDNI'),
+    obs:g('obs')
+  };
+  // ── Guardar en historial propio de B1
+  const recs=getRecs();recs.unshift(rec);localStorage.setItem(REC_KEY,JSON.stringify(recs.slice(0,300)));
+
+  // ── Sincronizar con B2 (Kanban) — traducir campos al formato del tablero
+  try {
+    const KANBAN_KEY = 'ff_kanban_v1';
+    const kanbanCard = {
+      id:       rec.id,
+      ts:       rec.ts,
+      prep:     rec.preparado,
+      suc:      rec.sucursal,
+      emp:      rec.encargado,
+      cant:     rec.cantidad + (rec.presentacion ? ' ' + rec.presentacion : ''),
+      conc:     rec.concentracion || '',
+      urg:      rec.urgencia === 'urgente' ? 'urgente' : 'normal',
+      obs:      [
+                  rec.indicaciones,
+                  rec.obs,
+                  rec.retiraNombre ? 'Retira: ' + rec.retiraNombre + ' (DNI ' + rec.retiraDNI + ')' : '',
+                  rec.receta === 'Si' ? 'Con receta médica' : ''
+                ].filter(Boolean).join(' · ') || '',
+      col:      'recibido',
+      esNuevo:  rec.esNuevo || false,
+      _new:     true,   // activa el flash amarillo en B2
+      notes:    '',
+      _fromB1:  true    // marca de origen para el banner de B2
+    };
+    let kanban = [];
+    try { kanban = JSON.parse(localStorage.getItem(KANBAN_KEY) || '[]'); } catch(e){}
+    // Evitar duplicados si se reenvía el mismo pedido
+    kanban = kanban.filter(c => c.id !== kanbanCard.id);
+    kanban.unshift(kanbanCard);
+    localStorage.setItem(KANBAN_KEY, JSON.stringify(kanban.slice(0, 300)));
+  } catch(e) { console.warn('Sync B2 error:', e); }
+
+  document.getElementById('succId').textContent='ID: '+id;
+  document.getElementById('fbody').style.display='none';
+  document.getElementById('progWrap').style.display='none';
+  document.getElementById('navBar').style.display='none';
+  document.getElementById('succScreen').classList.add('on');
+  window.scrollTo(0,0);
+}
+function resetForm(){location.reload();}
+
+// ── HISTORIAL ──────────────────────────────────────────────────────────────
+function getRecs(){try{return JSON.parse(localStorage.getItem(REC_KEY)||'[]');}catch{return[];}}
+let curF='all';
+function fh(f,el){curF=f;document.querySelectorAll('.hfil').forEach(e=>e.classList.remove('on'));el.classList.add('on');renderHist(f);}
+function renderHist(f){
+  let recs=getRecs();if(f!=='all')recs=recs.filter(r=>r.estado===f);
+  const list=document.getElementById('hList');
+  document.getElementById('hCount').textContent=`${recs.length} pedido${recs.length!==1?'s':''}`;
+  if(!recs.length){list.innerHTML='<div class="hempty">No hay pedidos registrados aún.</div>';return;}
+  const sb={pendiente:'<span class="badge ba">Pendiente</span>',entregado:'<span class="badge bv">Entregado</span>'};
+  list.innerHTML=recs.map((r,i)=>{
+    const d=new Date(r.ts);
+    const fecha=d.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'});
+    return `<div class="hcard" onclick="togH(${i})">
+      <div class="hchdr">
+        <div class="hcl"><h3>${r.preparado}</h3><p>${r.sucursal} · ${fecha} · ${r.encargado}</p></div>
+        ${sb[r.estado]||'<span class="badge ba">Pendiente</span>'}
+      </div>
+      <div class="hcbody" id="hb-${i}">
+        <div class="hdet">
+          <strong>Preparado:</strong> ${r.preparado}${r.esNuevo?' <span style="font-size:10px;background:#FAEEDA;color:#633806;padding:1px 6px;border-radius:10px;font-weight:600">Nuevo</span>':''}<br>
+          <strong>Cantidad:</strong> ${r.cantidad} ${r.presentacion}${r.concentracion?' · '+r.concentracion:''}<br>
+          <strong>Receta:</strong> ${r.receta} · <strong>Urgencia:</strong> ${r.urgencia}<br>
+          ${r.retiraNombre?`<strong>Retira:</strong> ${r.retiraNombre} &nbsp;·&nbsp; <strong>DNI:</strong> ${r.retiraDNI}<br>`:''}
+          ${r.indicaciones?`<strong>Indicaciones:</strong> <em>${r.indicaciones}</em><br>`:''}
+          ${r.obs?`<strong>Obs:</strong> <em>${r.obs}</em><br>`:''}
+          <strong>ID:</strong> ${r.id}
+        </div>
+        <div style="margin-top:8px;display:flex;gap:6px">
+          <button onclick="event.stopPropagation();markDone(${i})" style="font-size:11px;background:var(--vbg);color:var(--verde);border:1px solid var(--vb);border-radius:6px;padding:4px 10px;cursor:pointer">✓ Marcar entregado</button>
+          <button onclick="event.stopPropagation();deleteOne(${i})" style="font-size:11px;background:var(--rbg);color:var(--rojo);border:1px solid var(--rb);border-radius:6px;padding:4px 10px;cursor:pointer">✕ Eliminar</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function togH(i){const b=document.getElementById('hb-'+i);if(b)b.classList.toggle('on');}
+function markDone(i){
+  openModal('Marcar como entregado','Ingresá el código del laboratorio para confirmar','markDone',i);
+}
+function clearHist(){
+  openModal('Borrar todos los pedidos','Ingresá el código del laboratorio para confirmar. Esta acción no se puede deshacer.','clearAll',null);
+}
+function deleteOne(i){
+  openModal('Eliminar pedido','Ingresá el código del laboratorio para confirmar','deleteOne',i);
+}
+
+// ── MODAL CÓDIGO ────────────────────────────────────────────────────────────
+function openModal(title, sub, action, payload){
+  mBuf=''; mAction=action; mPayload=payload;
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalSub').textContent=sub;
+  document.getElementById('modalErr').textContent='';
+  renderMDots(false);
+  document.getElementById('modalBg').classList.add('open');
+}
+function mPress(d){
+  if(mBuf.length>=4) return;
+  mBuf+=d; renderMDots(false);
+  if(mBuf.length===4){
+    setTimeout(()=>{
+      if(mBuf===ADMIN_CODE){
+        document.getElementById('modalBg').classList.remove('open');
+        execAction(mAction, mPayload);
+      } else {
+        renderMDots(true);
+        document.getElementById('modalErr').textContent='Código incorrecto. Intentá de nuevo.';
+        setTimeout(()=>{mBuf='';renderMDots(false);document.getElementById('modalErr').textContent='';},900);
+      }
+    },120);
+  }
+}
+function mDel(){mBuf=mBuf.slice(0,-1);renderMDots(false);}
+function mCancel(){mBuf='';document.getElementById('modalBg').classList.remove('open');}
+function renderMDots(wrong){
+  for(let i=0;i<4;i++){
+    const d=document.getElementById('md'+i);
+    d.className='modal-dot'+(i<mBuf.length?(wrong?' wrong':' filled'):'');
+  }
+}
+function execAction(action, payload){
+  if(action==='markDone'){
+    const recs=getRecs();
+    if(recs[payload]){recs[payload].estado='entregado';localStorage.setItem(REC_KEY,JSON.stringify(recs));}
+    renderHist(curF);
+  } else if(action==='clearAll'){
+    localStorage.removeItem(REC_KEY);
+    renderHist('all');
+  } else if(action==='deleteOne'){
+    const recs=getRecs();
+    recs.splice(payload,1);
+    localStorage.setItem(REC_KEY,JSON.stringify(recs));
+    renderHist(curF);
+  }
+}
+
+// ── VADEMECUM ──────────────────────────────────────────────────────────────
+function renderVade(q){
+  const list=document.getElementById('vList');
+  const items=q?VADE.filter(p=>p.n.toLowerCase().includes(q.toLowerCase())||p.cat.toLowerCase().includes(q.toLowerCase())||p.acc.toLowerCase().includes(q.toLowerCase())):VADE;
+  if(!items.length){list.innerHTML='<div class="hempty">No se encontraron preparados.</div>';return;}
+  list.innerHTML=items.map((p,i)=>`
+    <div class="vcard" onclick="togV(${VADE.indexOf(p)})">
+      <div class="vcH"><div><h3>${p.n}</h3><p>${p.acc||''}</p></div><span class="vtag">${p.cat}</span></div>
+      <div class="vcbody" id="vc-${VADE.indexOf(p)}">
+        ${p.comp?`<div class="vrow"><span class="vk">Composición</span><span class="vv">${p.comp}</span></div>`:''}
+        ${p.pos?`<div class="vrow"><span class="vk">Posología</span><span class="vv">${p.pos}</span></div>`:''}
+        ${p.pres?`<div class="vrow"><span class="vk">Presentación</span><span class="vv">${p.pres}</span></div>`:''}
+        ${p.venc?`<div class="vrow"><span class="vk">Vencimiento</span><span class="vv">${p.venc}</span></div>`:''}
+        ${p.simil?`<div class="vrow"><span class="vk">Símil comercial</span><span class="vv">${p.simil}</span></div>`:''}
+        ${p.contra?`<div style="background:var(--ambg);border:1px solid var(--abb);border-radius:6px;padding:7px 10px;font-size:11px;color:var(--am);margin-top:8px;line-height:1.5">⚠ Contraindicado en: ${p.contra}</div>`:''}
+        ${p.nota?`<div style="background:var(--abg);border:1px solid var(--ab);border-radius:6px;padding:7px 10px;font-size:11px;color:var(--azul);margin-top:6px;line-height:1.5">ℹ ${p.nota}</div>`:''}
+        <button onclick="event.stopPropagation();useInForm(${VADE.indexOf(p)})" style="margin-top:10px;font-size:11px;background:var(--verde);color:white;border:none;border-radius:6px;padding:6px 14px;cursor:pointer">Usar en nuevo pedido ↗</button>
+      </div>
+    </div>`).join('');
+}
+function togV(i){const b=document.getElementById('vc-'+i);if(b)b.classList.toggle('on');}
+function filterVade(v){renderVade(v);}
+function useInForm(i){
+  const p=VADE[i];
+  document.getElementById('preparado').value=p.n;
+  showPrepCard(p); st('form'); cur=1; rp(); showSec(1);
+}
+
+// ── TOAST ──────────────────────────────────────────────────────────────────
+function toast(msg){
+  let t=document.getElementById('_t');
+  if(!t){t=document.createElement('div');t.id='_t';t.style.cssText='position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:9px 16px;border-radius:20px;font-size:12px;font-weight:500;z-index:999;white-space:nowrap;transition:opacity .3s;pointer-events:none';document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',2200);
+}
+
+
+// ══ KANBAN PIN ══════════════════════════════════════════════════════════════
+const KPIN = '1234';
+const ADMIN_CODE_KANBAN = '9876';
+let kpBuf = '', kpUnlocked = false;
+
+function kpp(d){
+  if(kpBuf.length>=4) return;
+  kpBuf+=d; kpRD(false);
+  if(kpBuf.length===4){
+    setTimeout(()=>{
+      if(kpBuf===KPIN){
+        kpUnlocked=true;
+        document.getElementById('kpinOverlay').classList.remove('show');
+        document.getElementById('kanbanContent').style.display='block';
+        renderBoard(); updateB1Banner();
+      } else {
+        kpRD(true);
+        document.getElementById('kpErr').textContent='PIN incorrecto';
+        setTimeout(()=>{kpBuf='';kpRD(false);document.getElementById('kpErr').textContent='';},900);
+      }
+    },120);
+  }
+}
+function kpd(){ kpBuf=kpBuf.slice(0,-1); kpRD(false); }
+function kpRD(wrong){
+  for(let i=0;i<4;i++){
+    const d=document.getElementById('kd'+i);
+    if(d) d.className='kpin-dot'+(i<kpBuf.length?(wrong?' wrong':' filled'):'');
+  }
+}
+
+// ══ KANBAN JS ════════════════════════════════════════════════════════════════
+// ── CONFIG ─────────────────────────────────────────────────────────────────
+const KEY = 'ff_kanban_v1';
+const COLS = [
+  {id:'recibido',    name:'Recibido',      eta:'Mismo día',         dot:'#64b5f6'},
+  {id:'presupuestado',name:'Presupuestado',eta:'1–2 días',          dot:'#FAC775'},
+  {id:'elaboracion', name:'En elaboración',eta:'2–4 días',          dot:'#B5B0F5'},
+  {id:'listo',       name:'Listo',         eta:'Avisar a sucursal', dot:'#639922'},
+  {id:'entregado',   name:'Entregado',     eta:'Cerrado',           dot:'#888780'},
+];
+const SUCS = ['Central Guernica','Central Numancia','Fullfarma Nueva',
+              'Fullfarma Berlin','Fullfarma Glew','Fullfarma Rivadavia'];
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+let cards = [], dragId = null, filterVal = 'all', detailId = null;
+
+// ── DEMO DATA ──────────────────────────────────────────────────────────────
+const DEMO = [
+  {id:'PED-20250608-1021',prep:'Crema AAA',suc:'Central Guernica',emp:'García M.',
+   cant:'3 unidades',conc:'25g',urg:'normal',obs:'Sin observaciones.',
+   col:'recibido',ts:'2025-06-10T08:15:00',esNuevo:false},
+  {id:'PED-20250607-3341',prep:'Vaselina Azufrada',suc:'Fullfarma Glew',emp:'López R.',
+   cant:'1 unidad',conc:'5% · 100g',urg:'urgente',obs:'Para paciente con sarna. Prioridad alta.',
+   col:'recibido',ts:'2025-06-10T09:30:00',esNuevo:false},
+  {id:'PED-20250606-2218',prep:'Diclofenac Gel',suc:'Fullfarma Berlin',emp:'Rodríguez C.',
+   cant:'2 unidades',conc:'50g',urg:'normal',obs:'',
+   col:'presupuestado',ts:'2025-06-09T14:00:00',esNuevo:false},
+  {id:'PED-20250605-8821',prep:'Pasta Bebé Plus',suc:'Central Numancia',emp:'Martínez P.',
+   cant:'5 unidades',conc:'60g',urg:'normal',obs:'Para stock de sucursal.',
+   col:'presupuestado',ts:'2025-06-08T11:20:00',esNuevo:false},
+  {id:'PED-20250604-4490',prep:'Crema para Talones',suc:'Fullfarma Nueva',emp:'Sosa L.',
+   cant:'2 unidades',conc:'50g',urg:'normal',obs:'',
+   col:'elaboracion',ts:'2025-06-07T10:00:00',esNuevo:false},
+  {id:'PED-20250603-9912',prep:'Gotas Hepáticas',suc:'Fullfarma Rivadavia',emp:'Torres M.',
+   cant:'3 frascos',conc:'60ml',urg:'urgente',obs:'Cliente crónico, renovación mensual.',
+   col:'elaboracion',ts:'2025-06-06T09:00:00',esNuevo:false},
+  {id:'PED-20250602-1155',prep:'Magnesio Citrato Cápsulas',suc:'Central Guernica',emp:'García M.',
+   cant:'2 cajas',conc:'300mg',urg:'normal',obs:'',
+   col:'listo',ts:'2025-06-05T15:00:00',esNuevo:false},
+  {id:'PED-20250601-6670',prep:'Acné Loción',suc:'Fullfarma Berlin',emp:'Rodríguez C.',
+   cant:'1 unidad',conc:'100ml',urg:'normal',obs:'',
+   col:'listo',ts:'2025-06-04T11:00:00',esNuevo:false},
+  {id:'PED-20250531-3301',prep:'Cápsulas Arándanos + Vit. C',suc:'Fullfarma Glew',emp:'López R.',
+   cant:'3 cajas',conc:'',urg:'normal',obs:'',
+   col:'entregado',ts:'2025-06-03T10:00:00',esNuevo:false},
+  {id:'PED-20250530-7782',prep:'Crema Antimicótica',suc:'Central Numancia',emp:'Martínez P.',
+   cant:'4 unidades',conc:'50g',urg:'normal',obs:'',
+   col:'entregado',ts:'2025-06-02T14:00:00',esNuevo:false},
+];
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+function kInit(){
+  const stored = localStorage.getItem(KEY);
+  if(stored){ try{ cards = JSON.parse(stored); }catch{ cards = [...DEMO]; } }
+  else { cards = [...DEMO]; save(); }
+  renderBoard();
+  updateHeader();
+  updateB1Banner();
+  // Escuchar cambios de localStorage en tiempo real (cuando B1 está abierto en otra pestaña)
+  window.addEventListener('storage', e => {
+    if(e.key === KEY){
+      try{ cards = JSON.parse(e.newValue||'[]'); }catch{}
+      renderBoard();
+      updateHeader();
+      updateB1Banner();
+      toast('📋 Nuevo pedido recibido desde B1');
+    }
+  });
+}
+
+function updateB1Banner(){
+  const fromB1 = cards.filter(c=>c._fromB1 && c.col!=='entregado');
+  const banner  = document.getElementById('b1Banner');
+  const bannerTxt = document.getElementById('b1BannerTxt');
+  if(!banner) return;
+  if(fromB1.length > 0){
+    const last = new Date(fromB1[0].ts);
+    const mins = Math.floor((Date.now()-last)/60000);
+    const timeStr = mins < 1 ? 'hace un momento' : mins < 60 ? `hace ${mins} min` : `hace ${Math.floor(mins/60)}h`;
+    bannerTxt.textContent = `Integración con B1 activa: los pedidos del formulario de sucursales aparecen aquí automáticamente · Último: ${timeStr}`;
+  } else {
+    bannerTxt.textContent = 'Integración con B1 activa: cuando una sucursal envíe un pedido, aparecerá aquí automáticamente en "Recibido"';
+  }
+}
+function save(){ localStorage.setItem(KEY, JSON.stringify(cards)); }
+function updateHeader(){
+  const active = cards.filter(c=>c.col!=='entregado').length;
+  const urg    = cards.filter(c=>c.urg==='urgente'&&c.col!=='entregado').length;
+  document.getElementById('badgeTotal').textContent = `${active} activos${urg?' · '+urg+' urgentes':''}`;
+  const today = new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('headerSub').textContent = today;
+}
+
+// ── RENDER ─────────────────────────────────────────────────────────────────
+function renderBoard(){
+  const board = document.getElementById('board');
+  if(!board) return; // tablero aun no visible
+  const q = (document.getElementById('searchInput')?.value||'').toLowerCase();
+  board.innerHTML = '';
+
+  COLS.forEach(col => {
+    let colCards = cards.filter(c => c.col === col.id);
+    if(filterVal === 'urgente') colCards = colCards.filter(c=>c.urg==='urgente');
+    else if(filterVal !== 'all') colCards = colCards.filter(c=>c.suc===filterVal);
+    if(q) colCards = colCards.filter(c=>
+      c.prep.toLowerCase().includes(q)||c.suc.toLowerCase().includes(q)||
+      c.emp.toLowerCase().includes(q)||(c.id||'').toLowerCase().includes(q));
+
+    const div = document.createElement('div');
+    div.className = 'col';
+    div.dataset.col = col.id;
+    div.innerHTML = `
+      <div class="col-header">
+        <div class="col-title-row">
+          <div class="col-name">
+            <div class="col-dot"></div>${col.name}
+          </div>
+          <span class="col-count">${colCards.length}</span>
+        </div>
+        <div class="col-eta">${col.eta}</div>
+      </div>
+      <div class="cards" id="cards-${col.id}" 
+           ondragover="onDragOver(event,'${col.id}')"
+           ondrop="onDrop(event,'${col.id}')"
+           ondragleave="onDragLeave(event,'${col.id}')">
+        ${colCards.length===0 ? `<div class="empty-col">Sin pedidos<br>en este estado</div>` : ''}
+      </div>`;
+
+    colCards.forEach(c => {
+      const cardsEl = div.querySelector('.cards');
+      const cardEl  = buildCard(c);
+      cardsEl.appendChild(cardEl);
+    });
+
+    board.appendChild(div);
+  });
+  updateHeader();
+}
+
+function buildCard(c){
+  const el = document.createElement('div');
+  el.className = 'card' + (c._new?' new-flash':'');
+  el.dataset.id  = c.id;
+  el.dataset.urg = c.urg;
+  el.draggable   = true;
+  if(c._new){ setTimeout(()=>{ c._new=false; save(); }, 700); }
+
+  const days = Math.floor((Date.now()-new Date(c.ts))/(1000*60*60*24));
+  let daysCls = 'days-ok', daysLbl = `${days}d`;
+  if(days>=3&&c.col!=='entregado') daysCls='days-warn';
+  if(days>=6&&c.col!=='entregado') daysCls='days-late';
+
+  el.innerHTML = `
+    <div class="card-id">${c.id}</div>
+    <div class="card-name">${c.prep}</div>
+    <div class="card-meta">${c.cant}${c.conc?' · '+c.conc:''}</div>
+    <div class="card-tags">
+      <span class="tag tag-suc">${sucShort(c.suc)}</span>
+      ${c.urg==='urgente'?'<span class="tag tag-urg">Urgente</span>':''}
+      ${c.esNuevo?'<span class="tag tag-new">Nuevo</span>':''}
+    </div>
+    <div class="card-footer">
+      <span class="card-date">${c.emp||'—'}</span>
+      <div style="display:flex;align-items:center;gap:5px">
+        <span class="days-badge ${daysCls}">${daysLbl}</span>
+        <div class="card-actions">
+          <button class="card-btn" title="Ver detalle" onclick="event.stopPropagation();openDetail('${c.id}')">
+            <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          <button class="card-btn" title="Avanzar estado" onclick="event.stopPropagation();advance('${c.id}')">
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>`;
+
+  el.addEventListener('dragstart', e=>{ dragId=c.id; el.classList.add('dragging'); });
+  el.addEventListener('dragend',   e=>{ dragId=null; el.classList.remove('dragging'); });
+  el.addEventListener('click', ()=>openDetail(c.id));
+  return el;
+}
+
+function sucShort(s){
+  const m={'Central Guernica':'Guernica','Central Numancia':'Numancia',
+           'Fullfarma Nueva':'Nueva','Fullfarma Berlin':'Berlin',
+           'Fullfarma Glew':'Glew','Fullfarma Rivadavia':'Rivadavia'};
+  return m[s]||s;
+}
+
+// ── DRAG & DROP ────────────────────────────────────────────────────────────
+function onDragOver(e, colId){
+  e.preventDefault();
+  document.querySelector(`[data-col="${colId}"]`)?.classList.add('drag-over');
+}
+function onDragLeave(e, colId){
+  document.querySelector(`[data-col="${colId}"]`)?.classList.remove('drag-over');
+}
+function onDrop(e, colId){
+  e.preventDefault();
+  document.querySelector(`[data-col="${colId}"]`)?.classList.remove('drag-over');
+  if(!dragId) return;
+  const c = cards.find(x=>x.id===dragId);
+  if(c && c.col !== colId){
+    const prev = c.col;
+    c.col = colId;
+    save(); renderBoard();
+    toast(`"${c.prep}" movido a ${colLabel(colId)}`);
+    if(colId==='entregado') toast(`✓ Pedido entregado — ${c.id}`);
+  }
+}
+
+function colLabel(id){ return COLS.find(c=>c.id===id)?.name||id; }
+
+// ── ADVANCE ────────────────────────────────────────────────────────────────
+function advance(id){
+  const c = cards.find(x=>x.id===id);
+  if(!c) return;
+  const idx = COLS.findIndex(x=>x.id===c.col);
+  if(idx<COLS.length-1){
+    c.col = COLS[idx+1].id;
+    save(); renderBoard();
+    toast(`"${c.prep}" → ${colLabel(c.col)}`);
+  }
+}
+
+// ── FILTER ────────────────────────────────────────────────────────────────
+function setFilter(val, el){
+  filterVal = val;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  renderBoard();
+}
+
+// ── DETAIL MODAL ───────────────────────────────────────────────────────────
+function openDetail(id){
+  const c = cards.find(x=>x.id===id);
+  if(!c) return;
+  detailId = id;
+  document.getElementById('dTitle').textContent = c.prep;
+
+  const statusBtns = COLS.map(col=>`
+    <button class="status-pill ${c.col===col.id?'active':''}" 
+            data-s="${col.id}" onclick="setDetailStatus('${col.id}')">
+      ${col.name}
+    </button>`).join('');
+
+  document.getElementById('dBody').innerHTML = `
+    <div style="margin-bottom:14px">
+      <div class="modal-label">Cambiar estado</div>
+      <div class="status-row">${statusBtns}</div>
+    </div>
+    <div class="modal-row">
+      <div class="modal-section">
+        <div class="modal-label">ID de pedido</div>
+        <div class="modal-value" style="font-family:monospace;font-size:11px">${c.id}</div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-label">Urgencia</div>
+        <div class="modal-value">
+          <select id="d-urg" style="width:100%;padding:5px 8px;border:1px solid var(--gb);border-radius:6px;font-size:12px">
+            <option value="normal" ${c.urg==='normal'?'selected':''}>Normal</option>
+            <option value="urgente" ${c.urg==='urgente'?'selected':''}>Urgente</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-row">
+      <div class="modal-section">
+        <div class="modal-label">Sucursal</div>
+        <div class="modal-value">${c.suc}</div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-label">Solicitado por</div>
+        <div class="modal-value">${c.emp||'—'}</div>
+      </div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-label">Cantidad / Concentración</div>
+      <div class="modal-value">${c.cant}${c.conc?' · '+c.conc:''}</div>
+    </div>
+    ${c.obs?`<div class="modal-section">
+      <div class="modal-label">Observaciones</div>
+      <div class="modal-value" style="font-style:italic">${c.obs}</div>
+    </div>`:''}
+    <div class="modal-section">
+      <div class="modal-label">Notas del laboratorio</div>
+      <textarea id="d-notes" style="width:100%;padding:8px 10px;border:1px solid var(--gb);border-radius:8px;font-size:12px;font-family:var(--f);min-height:60px;resize:vertical" 
+                placeholder="Precio presupuestado, observaciones de elaboración...">${c.notes||''}</textarea>
+    </div>
+    <div class="modal-section">
+      <div class="modal-label">Fecha de ingreso</div>
+      <div class="modal-value">${new Date(c.ts).toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+    </div>`;
+
+  document.getElementById('detailBg').classList.add('open');
+}
+
+function setDetailStatus(s){
+  document.querySelectorAll('.status-pill').forEach(b=>{
+    b.classList.toggle('active', b.dataset.s===s);
+  });
+}
+function closeDetail(e){ if(e.target===document.getElementById('detailBg')) closeDetailDirect(); }
+function closeDetailDirect(){ document.getElementById('detailBg').classList.remove('open'); detailId=null; }
+
+function saveDetail(){
+  const c = cards.find(x=>x.id===detailId);
+  if(!c) return;
+  const newStatus = document.querySelector('.status-pill.active')?.dataset.s;
+  if(newStatus) c.col = newStatus;
+  c.urg   = document.getElementById('d-urg').value;
+  c.notes = document.getElementById('d-notes').value;
+  save(); renderBoard();
+  closeDetailDirect();
+  toast('Cambios guardados');
+}
+
+function deleteCard(){
+  if(!confirm('¿Eliminar este pedido del tablero?')) return;
+  cards = cards.filter(x=>x.id!==detailId);
+  save(); renderBoard();
+  closeDetailDirect();
+  toast('Pedido eliminado');
+}
+
+// ── CREATE FORM ────────────────────────────────────────────────────────────
+function openForm(){ document.getElementById('formModal').classList.add('open'); }
+function closeForm(e){ if(e.target===document.getElementById('formModal')) closeFormDirect(); }
+function closeFormDirect(){ document.getElementById('formModal').classList.remove('open'); }
+
+function createCard(){
+  const prep = document.getElementById('f-prep').value.trim();
+  const suc  = document.getElementById('f-suc').value;
+  if(!prep||!suc){ toast('Ingresá el preparado y la sucursal'); return; }
+  const now = new Date();
+  const id  = 'PED-'+now.getFullYear()+String(now.getMonth()+1).padStart(2,'0')+
+               String(now.getDate()).padStart(2,'0')+'-'+String(Math.floor(Math.random()*9000)+1000);
+  const card = {
+    id, prep, suc,
+    emp:  document.getElementById('f-emp').value.trim(),
+    cant: document.getElementById('f-cant').value.trim()||'—',
+    conc: document.getElementById('f-conc').value.trim(),
+    urg:  document.getElementById('f-urg').value,
+    obs:  document.getElementById('f-obs').value.trim(),
+    col:'recibido', ts:now.toISOString(), esNuevo:false, _new:true, notes:'',
+  };
+  cards.unshift(card);
+  save(); renderBoard();
+  closeFormDirect();
+  // Reset form
+  ['f-prep','f-suc','f-emp','f-cant','f-conc','f-obs'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('f-urg').value='normal';
+  toast('Tarjeta creada en Recibido');
+}
+
+// ── TOAST ──────────────────────────────────────────────────────────────────
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+
+// Auto-load kanban data
+kInit();
+</script>
+</body>
+</html>
