@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preparados Magistrales — Farmacia Nueva Fulchi</title>
+<meta name="description" content="Elaboramos preparados magistrales y fórmulas farmacéuticas a pedido en nuestro laboratorio propio. Más de 38 preparados disponibles. Longchamps, GBA.">
+
+<style>
+:root{
+  --v:#27500A;--vbg:#EAF3DE;--vmid:#639922;--vb:#C0DD97;
+  --az:#0C447C;--abg:#E6F1FB;--ab:#85B7EB;
+  --am:#633806;--ambg:#FAEEDA;--abb:#FAC775;
+  --r:#791F1F;--rbg:#FCEBEB;
+  --gb:#D3D1C7;--gl:#F4F2EB;--gm:#888780;--gt:#444441;
+  --negro:#1a1a1a;--blanco:#ffffff;
+  --wa:#25D366;
+  --f:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f);background:var(--gl);color:var(--gt);line-height:1.6}
+.page{max-width:800px;margin:0 auto;padding:28px 18px 48px}
+
+/* HERO */
+.hero{background:var(--v);color:#fff;border-radius:var(--radius);padding:28px 24px;margin-bottom:28px}
+.hero-badge{font-size:11px;background:rgba(255,255,255,.2);border-radius:20px;padding:3px 10px;display:inline-block;margin-bottom:10px;letter-spacing:.04em}
+.hero h1{font-size:26px;font-weight:700;line-height:1.25;margin-bottom:8px}
+.hero p{font-size:14px;opacity:.88;max-width:520px;line-height:1.6}
+
+/* SECCIONES */
+.section{background:var(--blanco);border-radius:var(--radius);border:1px solid var(--gb);padding:22px 22px;margin-bottom:18px}
+.section-title{font-size:16px;font-weight:600;color:var(--negro);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-title .icon{font-size:20px}
+
+/* SERVICIOS GRID */
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.service-card{background:var(--gl);border:1px solid var(--gb);border-radius:var(--radius);padding:16px 18px}
+.service-card h3{font-size:14px;font-weight:600;color:var(--negro);margin-bottom:5px;display:flex;align-items:center;gap:7px}
+.service-card p{font-size:13px;color:var(--gm);line-height:1.5}
+.service-card .tag{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;margin-top:8px}
+.tag-libre{background:var(--vbg);color:var(--v)}
+.tag-turno{background:var(--abg);color:var(--az)}
+
+/* INFO ROWS */
+.info-row{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--gl)}
+.info-row:last-child{border-bottom:none}
+.info-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.info-label{font-size:12px;color:var(--gm);margin-bottom:2px;font-weight:500}
+.info-val{font-size:14px;color:var(--negro);line-height:1.5}
+.info-val strong{color:var(--v)}
+
+/* HORARIOS TABLE */
+.horario-table{width:100%;border-collapse:collapse;font-size:14px}
+.horario-table tr{border-bottom:1px solid var(--gl)}
+.horario-table tr:last-child{border-bottom:none}
+.horario-table td{padding:9px 4px}
+.horario-table td:first-child{color:var(--gm);width:140px;font-weight:500}
+.horario-table td:last-child{color:var(--negro);font-weight:600}
+.horario-badge{display:inline-block;background:var(--vbg);color:var(--v);font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;margin-left:8px}
+
+/* LISTA */
+.list-items{display:flex;flex-direction:column;gap:8px}
+.list-item{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--gt)}
+.list-item .check{color:var(--vmid);font-size:16px;flex-shrink:0;margin-top:1px}
+
+/* HIGHLIGHT BOX */
+.highlight{background:var(--vbg);border:1px solid var(--vb);border-radius:var(--radius);padding:16px 18px;margin-bottom:18px}
+.highlight p{font-size:14px;color:var(--v);line-height:1.6}
+.highlight strong{color:var(--negro)}
+
+.alert-box{background:var(--ambg);border:1px solid var(--abb);border-radius:var(--radius);padding:14px 16px;margin-bottom:18px;font-size:13px;color:var(--am);line-height:1.6}
+
+/* BOTONES */
+.btn-wa{
+  display:inline-flex;align-items:center;gap:9px;
+  background:var(--wa);color:#fff;border:none;border-radius:9px;
+  padding:12px 20px;font-size:14px;font-weight:600;font-family:var(--f);
+  cursor:pointer;text-decoration:none;
+  transition:background .15s;
+}
+.btn-wa:hover{background:#1fa855}
+.btn-wa svg{width:18px;height:18px;fill:#fff}
+.btn-tel{
+  display:inline-flex;align-items:center;gap:9px;
+  background:var(--az);color:#fff;border:none;border-radius:9px;
+  padding:12px 20px;font-size:14px;font-weight:600;font-family:var(--f);
+  cursor:pointer;text-decoration:none;
+  transition:background .15s;
+}
+.btn-tel:hover{background:#0a3a6b}
+.btn-map{
+  display:inline-flex;align-items:center;gap:9px;
+  background:var(--gl);color:var(--az);border:1px solid var(--ab);border-radius:9px;
+  padding:12px 20px;font-size:14px;font-weight:600;font-family:var(--f);
+  cursor:pointer;text-decoration:none;
+  transition:background .15s;
+}
+.btn-map:hover{background:var(--abg)}
+.btns-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+
+/* VADEMECUM GRID */
+.vade-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.vade-card{background:var(--gl);border:1px solid var(--gb);border-radius:9px;padding:12px 14px}
+.vade-card .vname{font-size:13px;font-weight:600;color:var(--negro);margin-bottom:3px}
+.vade-card .vcap{font-size:11px;color:var(--gm)}
+.vade-cat{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;display:inline-block;margin-top:5px}
+.cat-piel{background:#E8F5E9;color:#2E7D32}
+.cat-anti{background:#E3F2FD;color:#1565C0}
+.cat-dige{background:#FFF3E0;color:#E65100}
+.cat-suple{background:#F3E5F5;color:#6A1B9A}
+.cat-otras{background:var(--gl);color:var(--gm)}
+.cat-cosm{background:#FCE4EC;color:#880E4F}
+
+/* PROCESO STEPS */
+.steps{display:flex;flex-direction:column;gap:0}
+.step{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--gl)}
+.step:last-child{border-bottom:none}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--v);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-body h4{font-size:14px;font-weight:600;color:var(--negro);margin-bottom:3px}
+.step-body p{font-size:13px;color:var(--gm);line-height:1.5}
+
+/* FORM */
+.form-field{margin-bottom:14px}
+.form-field label{display:block;font-size:12px;font-weight:500;color:var(--negro);margin-bottom:4px}
+.form-field input,.form-field select,.form-field textarea{
+  width:100%;padding:10px 12px;border:1px solid var(--gb);border-radius:8px;
+  font-size:14px;font-family:var(--f);color:var(--negro);background:var(--blanco);
+  transition:border-color .15s;-webkit-appearance:none;
+}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{
+  outline:none;border-color:var(--ab);box-shadow:0 0 0 3px rgba(55,138,221,.1);
+}
+.form-field textarea{min-height:90px;resize:vertical;line-height:1.5}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn-submit{
+  width:100%;padding:12px;border:none;border-radius:9px;
+  background:var(--v);color:#fff;font-size:14px;font-weight:600;
+  font-family:var(--f);cursor:pointer;transition:background .15s;margin-top:4px;
+}
+.btn-submit:hover{background:#1e3d08}
+.success-msg{display:none;background:var(--vbg);border:1px solid var(--vb);border-radius:9px;padding:14px 16px;font-size:14px;color:var(--v);text-align:center;margin-top:12px}
+
+/* FOOTER INTERNO */
+.page-footer{text-align:center;font-size:12px;color:var(--gm);padding-top:24px;line-height:1.8}
+.page-footer a{color:var(--az);text-decoration:none}
+
+@media(max-width:520px){
+  .hero h1{font-size:21px}
+  .r2{grid-template-columns:1fr}
+  .btns-row{flex-direction:column}
+  .btn-wa,.btn-tel,.btn-map{justify-content:center;text-align:center}
+}
+</style>
+
+</head>
+<body>
+<div class="page">
+
+  <div class="hero">
+    <div class="hero-badge">Laboratorio propio</div>
+    <h1>Preparados magistrales elaborados en el local</h1>
+    <p>Contamos con laboratorio farmacéutico propio donde elaboramos fórmulas magistrales a pedido, bajo prescripción médica, con materias primas de calidad controlada.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="icon">⚗️</span>¿Qué es un preparado magistral?</div>
+    <p style="font-size:14px;color:var(--gt);line-height:1.7;margin-bottom:12px">
+      Un preparado magistral es un medicamento elaborado de forma individualizada por un farmacéutico, según prescripción médica, para un paciente concreto. Se usa cuando el medicamento comercial no existe en la concentración, forma farmacéutica o combinación que el médico necesita.
+    </p>
+    <div class="list-items">
+      <div class="list-item"><span class="check">✓</span><span>Elaboración en laboratorio habilitado bajo normas ANMAT</span></div>
+      <div class="list-item"><span class="check">✓</span><span>Control de calidad de materias primas y producto terminado</span></div>
+      <div class="list-item"><span class="check">✓</span><span>Entrega en el local o en cualquiera de nuestras sucursales</span></div>
+      <div class="list-item"><span class="check">✓</span><span>Más de 38 preparados disponibles — ver catálogo completo</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="icon">📋</span>Proceso de pedido</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Presentá tu receta médica</h4>
+          <p>En el local o enviando una foto por WhatsApp. La receta debe estar vigente y contener nombre del paciente, preparado, concentración y firma del médico.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Recibís el presupuesto</h4>
+          <p>Nuestro equipo te confirma precio, disponibilidad de materias primas y plazo de elaboración (generalmente 3–5 días hábiles).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Elaboración en nuestro laboratorio</h4>
+          <p>Preparamos tu fórmula con materias primas de calidad, siguiendo las Buenas Prácticas de Elaboración (ANMAT).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Retiro y entrega</h4>
+          <p>Pasás a retirar por el local o lo retira la persona que indiques presentando DNI. También podés coordinar envío.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="icon">🗂</span>Catálogo de preparados — Vademecum 2025</div>
+    <div class="vade-grid">
+      <div class="vade-card"><div class="vname">Crema AAA</div><div class="vcap">Antimicótica · antibiótica · antialérgica</div><span class="vade-cat cat-piel">Piel</span></div>
+      <div class="vade-card"><div class="vname">Crema Vit. A + Triamcinolona</div><div class="vcap">Antialérgica y reparadora</div><span class="vade-cat cat-piel">Piel</span></div>
+      <div class="vade-card"><div class="vname">Vitamina A Crema (tipo Bagovit)</div><div class="vcap">Nutritiva y regeneradora</div><span class="vade-cat cat-piel">Piel</span></div>
+      <div class="vade-card"><div class="vname">Crema Vit. A + Vit. E (tipo Dermaglós)</div><div class="vcap">Protectora y regeneradora</div><span class="vade-cat cat-piel">Piel</span></div>
+      <div class="vade-card"><div class="vname">Crema para Talones</div><div class="vcap">Hidratante, talones resecos</div><span class="vade-cat cat-piel">Piel</span></div>
+      <div class="vade-card"><div class="vname">Crema para Manos Agrietadas</div><div class="vcap">Hidratante y regeneradora</div><span class="vade-cat cat-piel">Piel</span></div>
+      <div class="vade-card"><div class="vname">Crema Facial Anti Age</div><div class="vcap">Arrugas y líneas de expresión</div><span class="vade-cat cat-cosm">Cosmética</span></div>
+      <div class="vade-card"><div class="vname">Crema Antimicótica</div><div class="vcap">Ketoconazol 2%</div><span class="vade-cat cat-anti">Antimicótico</span></div>
+      <div class="vade-card"><div class="vname">Crema Ungueal</div><div class="vcap">Bifonazol · Urea 30%</div><span class="vade-cat cat-anti">Antimicótico</span></div>
+      <div class="vade-card"><div class="vname">Talco Antimicótico</div><div class="vcap">Clotrimazole 1%</div><span class="vade-cat cat-anti">Antimicótico</span></div>
+      <div class="vade-card"><div class="vname">Diclofenac Gel</div><div class="vcap">Antiinflamatorio y analgésico</div><span class="vade-cat cat-otras">Antiinflamatorio</span></div>
+      <div class="vade-card"><div class="vname">Acné Loción</div><div class="vcap">Antiseborreico · queratolítico</div><span class="vade-cat cat-piel">Piel</span></div>
+      <div class="vade-card"><div class="vname">Vaselina Salicilada</div><div class="vcap">Queratolítico — psoriasis, ictiosis</div><span class="vade-cat cat-piel">Piel</span></div>
+      <div class="vade-card"><div class="vname">Vaselina Azufrada</div><div class="vcap">2%, 3%, 5%, 6% — ectoparasiticida</div><span class="vade-cat cat-otras">Antiparasitario</span></div>
+      <div class="vade-card"><div class="vname">Champú Anticaspa</div><div class="vcap">Ketoconazole 1%</div><span class="vade-cat cat-anti">Higiene</span></div>
+      <div class="vade-card"><div class="vname">Pediculicida Plus</div><div class="vcap">Ivermectina 1% — crema enjuague</div><span class="vade-cat cat-otras">Antipiojos</span></div>
+      <div class="vade-card"><div class="vname">Pediculicida</div><div class="vcap">Ipermetrina 1% (símil Kinderval)</div><span class="vade-cat cat-otras">Antipiojos</span></div>
+      <div class="vade-card"><div class="vname">Iodopovidona Solución</div><div class="vcap">Antiséptico 10% (símil Pervinox)</div><span class="vade-cat cat-otras">Antiséptico</span></div>
+      <div class="vade-card"><div class="vname">Clorhexidina 2%/4%</div><div class="vcap">Antiséptico · desinfectante</div><span class="vade-cat cat-otras">Antiséptico</span></div>
+      <div class="vade-card"><div class="vname">Aftas (Pomada)</div><div class="vcap">Triamcinolona · Lidocaína</div><span class="vade-cat cat-otras">Bucal</span></div>
+      <div class="vade-card"><div class="vname">Pasta Bebé Plus</div><div class="vcap">Cicatrizante (símil Hipoglós)</div><span class="vade-cat cat-piel">Pediatría</span></div>
+      <div class="vade-card"><div class="vname">Crema para Escaras</div><div class="vcap">Ácido Hialurónico · AGE</div><span class="vade-cat cat-piel">Heridas</span></div>
+      <div class="vade-card"><div class="vname">Gotas Hepáticas</div><div class="vcap">Digestivo · colerético (símil Hepatalgina)</div><span class="vade-cat cat-dige">Digestivo</span></div>
+      <div class="vade-card"><div class="vname">Gotas Laxantes</div><div class="vcap">Picosulfato de Sodio</div><span class="vade-cat cat-dige">Digestivo</span></div>
+      <div class="vade-card"><div class="vname">Cáps. Benzopirona + Escina</div><div class="vcap">Flebotónico · diurético</div><span class="vade-cat cat-otras">Circulación</span></div>
+      <div class="vade-card"><div class="vname">Pomada Sabañones</div><div class="vcap">Ictiol · Mentol · Alcanfor</div><span class="vade-cat cat-otras">Circulación</span></div>
+      <div class="vade-card"><div class="vname">Magnesio Citrato Cápsulas</div><div class="vcap">300mg — stress · insomnio · muscular</div><span class="vade-cat cat-suple">Suplemento</span></div>
+      <div class="vade-card"><div class="vname">Cáps. Arándanos + Vit. C</div><div class="vcap">Antiinflamatorio urinario</div><span class="vade-cat cat-suple">Suplemento</span></div>
+      <div class="vade-card"><div class="vname">Cáps. Ginkgo Biloba + Ajo + Zinc</div><div class="vcap">Antioxidante · circulación cerebral</div><span class="vade-cat cat-suple">Suplemento</span></div>
+      <div class="vade-card"><div class="vname">Cáps. Complejo Vit. B</div><div class="vcap">B1 · B6 · B12</div><span class="vade-cat cat-suple">Suplemento</span></div>
+      <div class="vade-card"><div class="vname">Cáps. Anticelulíticas</div><div class="vcap">Centella asiática · Carnitina · Cafeína</div><span class="vade-cat cat-cosm">Cosmética</span></div>
+      <div class="vade-card"><div class="vname">Crema de Borato de Sodio 3%</div><div class="vcap">Cándida vaginal · equilibrio pH</div><span class="vade-cat cat-otras">Ginecología</span></div>
+      <div class="vade-card"><div class="vname">Pomada Callicida</div><div class="vcap">Queratolítico para callos</div><span class="vade-cat cat-piel">Piel</span></div>
+      <div class="vade-card"><div class="vname">Nafazolina Gotas</div><div class="vcap">Descongestivo nasal (símil Rhinal)</div><span class="vade-cat cat-otras">Respiratorio</span></div>
+      <div class="vade-card"><div class="vname">Glucosa Anhidra</div><div class="vcap">75g — diagnóstico</div><span class="vade-cat cat-otras">Diagnóstico</span></div>
+      <div class="vade-card"><div class="vname">Glicerina Pura</div><div class="vcap">Humectante</div><span class="vade-cat cat-piel">Piel</span></div>
+      <div class="vade-card"><div class="vname">Azufre en Polvo</div><div class="vcap">25g</div><span class="vade-cat cat-otras">Dermatología</span></div>
+      <div class="vade-card"><div class="vname">Ginkgo Biloba Cápsulas</div><div class="vcap">80mg — neurotónico cerebral</div><span class="vade-cat cat-suple">Suplemento</span></div>
+    </div>
+    <p style="font-size:12px;color:var(--gm);margin-top:14px;line-height:1.5">
+      Catálogo Vademecum 2025 · Farmacia Nueva Fulchi. Si el preparado que necesitás no está en la lista, consultanos — podemos elaborar fórmulas específicas bajo prescripción médica.
+    </p>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="icon">💬</span>Hacer un pedido</div>
+    <p style="font-size:14px;color:var(--gt);margin-bottom:16px">
+      Para hacer un pedido, envianos la receta médica por WhatsApp o presentate en el local. Te confirmamos precio y plazo de entrega a la brevedad.
+    </p>
+    <div class="btns-row">
+      <a href="https://wa.me/5491159631267" target="_blank" class="btn-wa"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.555 4.116 1.527 5.845L.057 23.486c-.094.32.007.664.259.894.181.163.415.248.654.248.078 0 .157-.01.234-.03l5.86-1.528A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.938 0-3.77-.497-5.363-1.373l-.38-.213-3.938 1.027 1.004-3.813-.228-.374A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>Consultar por WhatsApp</a>
+      <a href="tel:01159631267" class="btn-tel">📞 011 5963-1267</a>
+    </div>
+  </div>
+
+  <div class="page-footer">
+  <strong>Farmacia Nueva Fulchi</strong> · Boulogne Sur Mer 1301, Longchamps (B1854)<br>
+  Lunes a sábado 8:30–20:30 hs · 011 5963-1267 · <a href="https://www.fullfarma.com.ar">fullfarma.com.ar</a>
+</div>
+</div>
+</body>
+</html>
