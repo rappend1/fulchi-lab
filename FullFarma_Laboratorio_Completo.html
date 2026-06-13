@@ -647,16 +647,18 @@ html,body{height:100%;font-family:var(--f);background:var(--gl);color:var(--gt)}
       <div class="sec" data-s="2">
         <div class="shdr"><div class="snum">3</div><div><div class="stit">Presupuesto y entrega</div><div class="ssub">Urgencia y datos de retiro</div></div></div>
 
+        <div class="alert al-b"><span class="ai">ℹ</span><span>Tocá una opción en cada sección para seleccionarla. Al final, confirmá el pedido para poder enviarlo.</span></div>
+
         <div class="field">
           <label>Urgencia del pedido <span class="req">*</span></label>
           <div class="og">
-            <label class="oc" onclick="sr(this,'urg','normal')"><input type="radio" name="urg" value="normal"><div><div class="ol">Normal — plazo estándar (3–5 días hábiles)</div></div></label>
+            <label class="oc sv" id="urgNormalCard" onclick="sr(this,'urg','normal')"><input type="radio" name="urg" value="normal" checked><div><div class="ol">Normal — plazo estándar (3–5 días hábiles)</div></div></label>
             <label class="oc" onclick="sr(this,'urg','urgente')"><input type="radio" name="urg" value="urgente"><div><div class="ol" style="color:var(--am)">Urgente — necesitado antes del plazo normal</div><div class="os">Confirmar disponibilidad con el laboratorio</div></div></label>
           </div>
         </div>
 
         <div class="field">
-          <label>¿Quién retira el pedido?</label>
+          <label>¿Quién retira el pedido? <span class="req">*</span><span class="hint">Tocá una opción para seleccionarla</span></label>
           <div class="og">
             <label class="oc" onclick="sr(this,'retira','sucursal');toggleRetiraFields('sucursal')"><input type="radio" name="retira" value="sucursal"><div><div class="ol">Personal de la sucursal</div></div></label>
             <label class="oc" onclick="sr(this,'retira','cliente');toggleRetiraFields('cliente')"><input type="radio" name="retira" value="cliente"><div><div class="ol">Cliente externo directamente</div></div></label>
@@ -1086,7 +1088,8 @@ function val(idx){
     }
   }
   if(idx===2){
-    if(!document.querySelector('[name=urg]:checked')){toast('Seleccioná la urgencia');return false;}
+    if(!document.querySelector('[name=urg]:checked')){toast('Seleccioná la urgencia del pedido');return false;}
+    if(!document.querySelector('[name=retira]:checked')){toast('Seleccioná quién retira el pedido');return false;}
     if(!document.getElementById('conf').checked){toast('Confirmá el pedido para continuar');return false;}
     document.getElementById('confName').textContent=g('encargado')||'—';
   }
@@ -1328,7 +1331,50 @@ function submitForm(){
   document.getElementById('succScreen').classList.add('on');
   window.scrollTo(0,0);
 }
-function resetForm(){location.reload();}
+function resetForm(){
+  // Resetear todos los campos del formulario
+  ['sucursal','receta','tieneWA'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('encargado').value='';
+  document.getElementById('preparado').value='';
+  document.getElementById('cantidad').value='';
+  document.getElementById('presentacion').value='';
+  document.getElementById('presentacionNueva').value='';
+  document.getElementById('concentracion').value='';
+  document.getElementById('indicaciones').value='';
+  document.getElementById('obs').value='';
+  if(document.getElementById('retiraNombre')) document.getElementById('retiraNombre').value='';
+  if(document.getElementById('retiraDNI')) document.getElementById('retiraDNI').value='';
+  // Resetear radio buttons y estilos de tarjetas de opción
+  document.querySelectorAll('[name="urg"],[name="retira"]').forEach(r=>{r.checked=false;});
+  document.querySelectorAll('.oc').forEach(c=>c.classList.remove('sv','sam'));
+  // Restaurar estado inicial: Urgencia = Normal seleccionada
+  const urgNormalInput = document.querySelector('[name="urg"][value="normal"]');
+  if(urgNormalInput){ urgNormalInput.checked=true; }
+  const urgNormalCard = document.getElementById('urgNormalCard');
+  if(urgNormalCard){ urgNormalCard.classList.add('sv'); }
+  // Resetear checkbox de confirmación
+  const conf=document.getElementById('conf'); if(conf) conf.checked=false;
+  const confCard=document.getElementById('confCard'); if(confCard) confCard.classList.remove('sv');
+  // Resetear flags y tarjeta de producto
+  prepEsNuevo=false;
+  toggleCamposNuevo(false);
+  hidePrepCard();
+  // Resetear campos condicionales de quien retira y ocultarlos
+  document.getElementById('retiraFields').style.display='none';
+  if(document.getElementById('retiraNombre')) document.getElementById('retiraNombre').required=false;
+  if(document.getElementById('retiraDNI')) document.getElementById('retiraDNI').required=false;
+  // Ocultar pantalla de éxito y mostrar formulario
+  document.getElementById('succScreen').classList.remove('on');
+  document.getElementById('fbody').style.display='block';
+  document.getElementById('progWrap').style.display='block';
+  document.getElementById('navBar').style.display='flex';
+  // Volver al paso 1
+  cur=0; rp(); showSec(0);
+  // Restaurar fecha actual
+  const now=new Date();
+  document.getElementById('fecha').value=now.toISOString().split('T')[0];
+  window.scrollTo(0,0);
+}
 
 // ── HISTORIAL ──────────────────────────────────────────────────────────────
 function getRecs(){try{return JSON.parse(localStorage.getItem(REC_KEY)||'[]');}catch{return[];}}
