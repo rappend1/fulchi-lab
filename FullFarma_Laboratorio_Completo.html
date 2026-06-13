@@ -88,14 +88,69 @@ textarea{min-height:72px;resize:vertical;line-height:1.5}
 .ac-cat{padding:5px 12px;font-size:10px;font-weight:600;color:var(--gm);background:var(--gl);text-transform:uppercase;letter-spacing:.05em}
 
 /* opt cards */
-.og{display:flex;flex-direction:column;gap:5px}
-.oc{display:flex;align-items:center;gap:9px;padding:9px 11px;border:1px solid var(--gb);border-radius:8px;cursor:pointer;transition:border-color .15s,background .15s;background:var(--blanco);-webkit-tap-highlight-color:transparent}
-.oc:hover{border-color:var(--ab)}
-.oc input{width:auto;padding:0;border:none;box-shadow:none;accent-color:var(--verde)}
-.oc.sv{border-color:var(--vb);background:var(--vbg)}
-.oc.sam{border-color:var(--abb);background:var(--ambg)}
-.ol{font-size:13px;color:var(--negro)}
-.os{font-size:10px;color:var(--gm);margin-top:1px}
+.og{display:flex;flex-direction:column;gap:7px}
+.oc{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:12px 14px;
+  border:1.5px solid var(--gb);border-radius:10px;
+  cursor:pointer;
+  transition:border-color .15s,background .15s,box-shadow .15s;
+  background:var(--blanco);
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+.oc:hover{border-color:var(--ab);background:#F5F9FF}
+/* radio custom — siempre visible */
+.oc input[type=radio]{
+  appearance:none;-webkit-appearance:none;
+  width:18px;height:18px;flex-shrink:0;margin-top:2px;
+  border:2px solid var(--gb);border-radius:50%;
+  background:var(--blanco);
+  cursor:pointer;
+  transition:border-color .15s,background .15s;
+  position:relative;
+}
+.oc input[type=radio]:checked{
+  border-color:#1a56db;
+  background:radial-gradient(circle, #1a56db 45%, var(--blanco) 46%);
+}
+.oc input[type=checkbox]{
+  appearance:none;-webkit-appearance:none;
+  width:18px;height:18px;flex-shrink:0;margin-top:2px;
+  border:2px solid var(--gb);border-radius:4px;
+  background:var(--blanco);
+  cursor:pointer;
+  transition:border-color .15s,background .15s;
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+}
+.oc input[type=checkbox]:checked{
+  border-color:var(--verde);
+  background:var(--verde);
+}
+.oc input[type=checkbox]:checked::after{
+  content:'';
+  position:absolute;
+  left:4px;top:1px;
+  width:6px;height:10px;
+  border:2px solid var(--blanco);
+  border-top:none;border-left:none;
+  transform:rotate(45deg);
+}
+/* estado seleccionado — verde */
+.oc.sv{
+  border-color:var(--vmid);border-width:2px;
+  background:var(--vbg);
+  box-shadow:0 0 0 3px rgba(99,153,34,.08);
+}
+/* estado seleccionado — ámbar (urgente) */
+.oc.sam{
+  border-color:var(--am);border-width:2px;
+  background:var(--ambg);
+  box-shadow:0 0 0 3px rgba(99,56,6,.07);
+}
+.ol{font-size:13px;font-weight:500;color:var(--negro);line-height:1.4}
+.os{font-size:11px;color:var(--gm);margin-top:3px;line-height:1.4}
 
 /* product info card */
 .pcard{background:var(--vbg);border:1px solid var(--vb);border-radius:10px;padding:12px 14px;margin-top:8px;display:none}
@@ -652,17 +707,17 @@ html,body{height:100%;font-family:var(--f);background:var(--gl);color:var(--gt)}
         <div class="field">
           <label>Urgencia del pedido <span class="req">*</span></label>
           <div class="og">
-            <label class="oc sv" id="urgNormalCard" onclick="sr(this,'urg','normal')"><input type="radio" name="urg" value="normal" checked><div><div class="ol">Normal — plazo estándar (3–5 días hábiles)</div></div></label>
-            <label class="oc" onclick="sr(this,'urg','urgente')"><input type="radio" name="urg" value="urgente"><div><div class="ol" style="color:var(--am)">Urgente — necesitado antes del plazo normal</div><div class="os">Confirmar disponibilidad con el laboratorio</div></div></label>
+            <label class="oc sv" id="urgNormalCard"><input type="radio" name="urg" value="normal" checked><div><div class="ol">Normal — plazo estándar (3–5 días hábiles)</div></div></label>
+            <label class="oc"><input type="radio" name="urg" value="urgente"><div><div class="ol" style="color:var(--am)">Urgente — necesitado antes del plazo normal</div><div class="os">Confirmar disponibilidad con el laboratorio</div></div></label>
           </div>
         </div>
 
         <div class="field">
           <label>¿Quién retira el pedido? <span class="req">*</span><span class="hint">Tocá una opción para seleccionarla</span></label>
           <div class="og">
-            <label class="oc" onclick="sr(this,'retira','sucursal');toggleRetiraFields('sucursal')"><input type="radio" name="retira" value="sucursal"><div><div class="ol">Personal de la sucursal</div></div></label>
-            <label class="oc" onclick="sr(this,'retira','cliente');toggleRetiraFields('cliente')"><input type="radio" name="retira" value="cliente"><div><div class="ol">Cliente externo directamente</div></div></label>
-            <label class="oc" onclick="sr(this,'retira','coordinado');toggleRetiraFields('coordinado')"><input type="radio" name="retira" value="coordinado"><div><div class="ol">A coordinar con el laboratorio</div></div></label>
+            <label class="oc"><input type="radio" name="retira" value="sucursal"><div><div class="ol">Personal de la sucursal</div></div></label>
+            <label class="oc"><input type="radio" name="retira" value="cliente"><div><div class="ol">Cliente externo directamente</div></div></label>
+            <label class="oc"><input type="radio" name="retira" value="coordinado"><div><div class="ol">A coordinar con el laboratorio</div></div></label>
           </div>
         </div>
 
@@ -684,7 +739,7 @@ html,body{height:100%;font-family:var(--f);background:var(--gl);color:var(--gt)}
 
         <div class="field">
           <label>Confirmo que los datos son correctos y completos <span class="req">*</span></label>
-          <label class="oc" id="confCard" onclick="togConf()">
+          <label class="oc" id="confCard">
             <input type="checkbox" id="conf">
             <div><div class="ol">Confirmo este pedido como responsable</div><div class="os" id="confName">—</div></div>
           </label>
@@ -1028,6 +1083,7 @@ function init(){
   document.getElementById('fecha').value=now.toISOString().split('T')[0];
   rp(); showSec(0);
   renderHist('all'); renderVade('');
+  initRadioCards();
 }
 
 // ── TABS ───────────────────────────────────────────────────────────────────
@@ -1101,8 +1157,29 @@ function sr(card,name,val){
   document.querySelectorAll(`[name="${name}"]`).forEach(r=>{
     const p=r.closest('.oc');if(p)p.classList.remove('sv','sam');
   });
-  const r=card.querySelector('input[type=radio]');if(r)r.checked=true;
   card.classList.add(['normal','sucursal','coordinado'].includes(val)?'sv':'sam');
+}
+function initRadioCards(){
+  // Urgencia
+  document.querySelectorAll('[name="urg"]').forEach(r=>{
+    r.addEventListener('change',function(){
+      if(this.checked) sr(this.closest('.oc'),'urg',this.value);
+    });
+  });
+  // Retira
+  document.querySelectorAll('[name="retira"]').forEach(r=>{
+    r.addEventListener('change',function(){
+      if(this.checked){
+        sr(this.closest('.oc'),'retira',this.value);
+        toggleRetiraFields(this.value);
+      }
+    });
+  });
+  // Confirmación — escucha el change nativo del checkbox
+  const conf = document.getElementById('conf');
+  if(conf) conf.addEventListener('change', function(){
+    document.getElementById('confCard').classList.toggle('sv', this.checked);
+  });
 }
 function toggleRetiraFields(val){
   const show = (val==='sucursal'||val==='cliente');
@@ -1113,7 +1190,8 @@ function toggleRetiraFields(val){
   if(!show){document.getElementById('retiraNombre').value='';document.getElementById('retiraDNI').value='';}
 }
 function togConf(){
-  const cb=document.getElementById('conf');cb.checked=!cb.checked;
+  // mantenida por compatibilidad — ya no se usa directamente
+  const cb=document.getElementById('conf');
   document.getElementById('confCard').classList.toggle('sv',cb.checked);
 }
 
