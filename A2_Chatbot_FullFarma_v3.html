@@ -227,6 +227,7 @@ const TREE = {
       { icon:'💊', text:'Medicamentos con receta',     next:'recetas'       },
       { icon:'🩸', text:'Glucemia y presión arterial', next:'servicios_salud'},
       { icon:'💬', text:'Hablar con un farmacéutico',  next:'whatsapp_directo'},
+      { icon:'📲', text:'Contacto y redes sociales',   next:'contacto_redes' },
     ]
   },
 
@@ -400,6 +401,17 @@ const TREE = {
     ]
   },
 
+  // ── CONTACTO Y REDES ──────────────────────────────────────────────────────
+  contacto_redes: {
+    msg: `📲 <strong>Contacto y redes sociales</strong>\n\nEncontranos en nuestras plataformas o contactanos directamente.`,
+    opts: [
+      { icon:'📸', text:'Instagram @fullfarmaok',        action:'instagram'    },
+      { icon:'🛒', text:'Tienda online — fullfarma.com.ar', action:'tienda'    },
+      { icon:'💬', text:'WhatsApp general',              action:'wa_general'   },
+      { icon:'🏠', text:'Volver al inicio',              next:'inicio'         },
+    ]
+  },
+
   // ── MAPS ──────────────────────────────────────────────────────────────────
   maps_selector: {
     msg: `🗺️ <strong>¿A qué sucursal querés llegar?</strong>`,
@@ -425,6 +437,7 @@ const ACTIONS = {
   maps_espora:      'https://maps.google.com/?q=Miguel+Cane+240+Glew+Buenos+Aires',
   maps_rivadavia:   'https://maps.google.com/?q=25+de+Mayo+895+Ministro+Rivadavia+Buenos+Aires',
   tienda:           'https://www.fullfarma.com.ar',
+  instagram:        'https://www.instagram.com/fullfarmaok/',
   catalogo:         'https://rappend1.github.io/fulchi-lab/C3_Preparados_Magistrales.html',
   wa_general:       `${WA_BASE}?text=${encodeURIComponent('Hola, tengo una consulta para la farmacia.')}`,
   wa_obras:         `${WA_BASE}?text=${encodeURIComponent('Hola, quiero consultar si trabajan con mi obra social:')}`,
