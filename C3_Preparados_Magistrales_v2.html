@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preparados Magistrales — Farmacia Nueva Fulchi</title>
+<style>
+:root{
+  --v:#27500A;--vbg:#EAF3DE;--vmid:#639922;--vb:#C0DD97;
+  --az:#0C447C;--abg:#E6F1FB;--ab:#85B7EB;
+  --am:#633806;--ambg:#FAEEDA;--abb:#FAC775;
+  --r:#791F1F;--rbg:#FCEBEB;
+  --gb:#D3D1C7;--gl:#F4F2EB;--gm:#888780;--gt:#444441;
+  --negro:#1a1a1a;--blanco:#ffffff;
+  --wa:#25D366;
+  --f:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f);background:var(--gl);color:var(--gt);line-height:1.6}
+.page{max-width:800px;margin:0 auto;padding:28px 18px 80px}
+
+/* HERO */
+.hero{background:var(--v);color:#fff;border-radius:var(--radius);padding:28px 24px;margin-bottom:28px}
+.hero-badge{font-size:11px;background:rgba(255,255,255,.2);border-radius:20px;padding:3px 10px;display:inline-block;margin-bottom:10px;letter-spacing:.04em}
+.hero h1{font-size:26px;font-weight:700;line-height:1.25;margin-bottom:8px}
+.hero p{font-size:14px;opacity:.88;max-width:520px;line-height:1.6}
+
+/* BOTÓN EDITAR en el footer */
+.edit-trigger{
+  background:none;border:none;
+  color:var(--gb);font-size:11px;font-family:var(--f);
+  padding:4px 8px;border-radius:20px;cursor:pointer;
+  transition:all .2s;letter-spacing:.03em;display:inline-block;margin-top:8px;
+}
+.edit-trigger:hover{color:var(--gm)}
+
+/* BANNER MODO EDICIÓN */
+.edit-banner{
+  display:none;background:#633806;color:#fff;
+  border-radius:var(--radius);padding:12px 18px;margin-bottom:18px;
+  font-size:13px;display:none;align-items:center;gap:10px;
+}
+.edit-banner.visible{display:flex}
+.edit-banner strong{font-weight:700}
+.edit-banner-btns{margin-left:auto;display:flex;gap:8px}
+.btn-add-prep{
+  display:inline-flex;align-items:center;gap:6px;
+  background:#fff;color:#633806;border:none;border-radius:7px;
+  padding:6px 14px;font-size:12px;font-weight:700;font-family:var(--f);cursor:pointer;
+  transition:background .15s;
+}
+.btn-add-prep:hover{background:#faeeda}
+.btn-exit-edit{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:7px;
+  padding:6px 14px;font-size:12px;font-weight:600;font-family:var(--f);cursor:pointer;
+  transition:background .15s;
+}
+.btn-exit-edit:hover{background:rgba(255,255,255,.25)}
+
+/* SECCIONES */
+.section{background:var(--blanco);border-radius:var(--radius);border:1px solid var(--gb);padding:22px;margin-bottom:18px}
+.section-title{font-size:16px;font-weight:600;color:var(--negro);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-title .icon{font-size:20px}
+
+/* PROCESO STEPS */
+.steps{display:flex;flex-direction:column}
+.step{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--gl)}
+.step:last-child{border-bottom:none}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--v);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-body h4{font-size:14px;font-weight:600;color:var(--negro);margin-bottom:3px}
+.step-body p{font-size:13px;color:var(--gm);line-height:1.5}
+
+/* LISTA */
+.list-items{display:flex;flex-direction:column;gap:8px}
+.list-item{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--gt)}
+.list-item .check{color:var(--vmid);font-size:16px;flex-shrink:0;margin-top:1px}
+
+/* BOTONES WA / TEL */
+.btn-wa{display:inline-flex;align-items:center;gap:9px;background:var(--wa);color:#fff;border:none;border-radius:9px;padding:12px 20px;font-size:14px;font-weight:600;font-family:var(--f);cursor:pointer;text-decoration:none;transition:background .15s}
+.btn-wa:hover{background:#1fa855}
+.btn-wa svg{width:18px;height:18px;fill:#fff}
+.btn-tel{display:inline-flex;align-items:center;gap:9px;background:var(--az);color:#fff;border:none;border-radius:9px;padding:12px 20px;font-size:14px;font-weight:600;font-family:var(--f);cursor:pointer;text-decoration:none;transition:background .15s}
+.btn-tel:hover{background:#0a3a6b}
+.btns-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+
+/* BÚSQUEDA */
+.search-wrap{position:relative;margin-bottom:12px}
+.search-wrap input{width:100%;padding:10px 12px 10px 36px;border:1px solid var(--gb);border-radius:9px;font-size:14px;font-family:var(--f);color:var(--negro);background:var(--blanco);transition:border-color .15s}
+.search-wrap input:focus{outline:none;border-color:var(--vmid)}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none}
+
+/* FILTROS */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.filter-btn{font-size:12px;font-weight:600;padding:5px 12px;border-radius:20px;border:1.5px solid var(--gb);background:var(--blanco);color:var(--gm);cursor:pointer;transition:all .15s;font-family:var(--f)}
+.filter-btn:hover{border-color:var(--vmid);color:var(--v)}
+.filter-btn.active{background:var(--v);border-color:var(--v);color:#fff}
+
+/* GRID */
+.vade-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.no-results{grid-column:1/-1;text-align:center;padding:30px 0;font-size:14px;color:var(--gm)}
+
+/* CARD EXPANDIBLE */
+.vade-card{background:var(--gl);border:1px solid var(--gb);border-radius:9px;overflow:hidden;transition:border-color .15s,box-shadow .15s}
+.vade-card:hover{border-color:var(--vmid);box-shadow:0 2px 8px rgba(39,80,10,.1)}
+.vade-card.expanded{border-color:var(--vmid);box-shadow:0 4px 16px rgba(39,80,10,.15)}
+
+.vade-header{padding:12px 14px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;cursor:pointer;user-select:none}
+.vade-header-left{flex:1;min-width:0}
+.vname{font-size:13px;font-weight:600;color:var(--negro);margin-bottom:3px}
+.vcap{font-size:11px;color:var(--gm)}
+.vade-cat{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;display:inline-block;margin-top:5px}
+.cat-piel{background:#E8F5E9;color:#2E7D32}
+.cat-anti{background:#E3F2FD;color:#1565C0}
+.cat-dige{background:#FFF3E0;color:#E65100}
+.cat-suple{background:#F3E5F5;color:#6A1B9A}
+.cat-otras{background:var(--gl);color:var(--gm);border:1px solid var(--gb)}
+.cat-cosm{background:#FCE4EC;color:#880E4F}
+.vade-chevron{font-size:12px;color:var(--gm);flex-shrink:0;margin-top:3px;transition:transform .25s}
+.vade-card.expanded .vade-chevron{transform:rotate(180deg);color:var(--v)}
+
+/* DETALLE */
+.vade-detail{display:none;border-top:1px solid var(--vb);background:#fff;padding:14px 14px 16px;animation:fadeIn .18s ease}
+.vade-card.expanded .vade-detail{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+
+.detail-row{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--gl);font-size:12px}
+.detail-row:last-child{border-bottom:none}
+.detail-label{color:var(--gm);font-weight:600;min-width:110px;flex-shrink:0;text-transform:uppercase;font-size:10px;letter-spacing:.04em;padding-top:2px}
+.detail-val{color:var(--negro);line-height:1.5}
+.detail-comp{background:var(--vbg);border-radius:6px;padding:2px 7px;font-size:11px;color:var(--v);font-weight:500;display:inline-block;margin:2px 2px 0 0}
+.detail-simil{color:var(--az);font-style:italic}
+.detail-warn{color:var(--r)}
+
+/* BOTÓN ELIMINAR (solo en modo edición) */
+.edit-actions{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--rbg)}
+.edit-mode .edit-actions{display:block}
+.btn-eliminar{display:inline-flex;align-items:center;gap:6px;background:var(--rbg);color:var(--r);border:1px solid #e8b4b4;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;font-family:var(--f);cursor:pointer;transition:background .15s}
+.btn-eliminar:hover{background:#f5d5d5}
+
+/* FOOTER */
+.page-footer{text-align:center;font-size:12px;color:var(--gm);padding-top:24px;line-height:1.8}
+.page-footer a{color:var(--az);text-decoration:none}
+
+/* MODAL BASE */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(3px);z-index:200;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:var(--radius);max-width:480px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25);animation:modalIn .2s ease}
+@keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid var(--gl)}
+.modal-head h3{font-size:16px;font-weight:700;color:var(--negro)}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--gm);padding:2px 6px;border-radius:5px}
+.modal-close:hover{background:var(--gl);color:var(--negro)}
+.modal-body{padding:20px}
+
+/* PIN */
+.pin-wrap{text-align:center;padding:4px 0}
+.pin-desc{font-size:14px;color:var(--gt);margin-bottom:16px}
+.pin-dots{display:flex;gap:10px;justify-content:center;margin-bottom:20px}
+.pin-dot{width:14px;height:14px;border-radius:50%;background:var(--gb);transition:background .15s}
+.pin-dot.filled{background:var(--v)}
+.pin-dot.error{background:var(--r)}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:200px;margin:0 auto}
+.pin-key{padding:14px 0;border-radius:9px;border:1.5px solid var(--gb);background:var(--gl);font-size:18px;font-weight:600;color:var(--negro);cursor:pointer;font-family:var(--f);transition:all .1s}
+.pin-key:hover{background:var(--vbg);border-color:var(--vb);color:var(--v)}
+.pin-key:active{transform:scale(.93)}
+.pin-key.del{font-size:14px;color:var(--gm)}
+.pin-error{font-size:12px;color:var(--r);text-align:center;margin-top:10px;min-height:16px}
+
+/* FORMULARIO */
+.form-field{margin-bottom:14px}
+.form-field label{display:block;font-size:11px;font-weight:700;color:var(--negro);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+.form-field input,.form-field select,.form-field textarea{width:100%;padding:10px 12px;border:1px solid var(--gb);border-radius:8px;font-size:14px;font-family:var(--f);color:var(--negro);background:var(--blanco);transition:border-color .15s;-webkit-appearance:none}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{outline:none;border-color:var(--vmid);box-shadow:0 0 0 3px rgba(99,153,34,.12)}
+.form-field textarea{min-height:70px;resize:vertical;line-height:1.5}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn-submit{width:100%;padding:13px;border:none;border-radius:9px;background:var(--v);color:#fff;font-size:14px;font-weight:600;font-family:var(--f);cursor:pointer;transition:background .15s;margin-top:4px}
+.btn-submit:hover{background:#1e3d08}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);color:#fff;padding:10px 20px;border-radius:9px;font-size:14px;font-weight:600;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.2);white-space:nowrap;pointer-events:none}
+
+@media(max-width:520px){
+  .hero h1{font-size:21px}
+  .r2{grid-template-columns:1fr}
+  .btns-row{flex-direction:column}
+  .btn-wa,.btn-tel{justify-content:center}
+  .edit-banner-btns{flex-direction:column;gap:6px}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="hero">
+    <div class="hero-badge">Laboratorio propio</div>
+    <h1>Preparados magistrales elaborados en el local</h1>
+    <p>Contamos con laboratorio farmacéutico propio donde elaboramos fórmulas magistrales a pedido, bajo prescripción médica, con materias primas de calidad controlada.</p>
+  </div>
+
+  <!-- Banner modo edición (oculto por defecto) -->
+  <div class="edit-banner" id="editBanner">
+    <span>✏️ <strong>Modo edición activo</strong> — podés agregar o eliminar preparados</span>
+    <div class="edit-banner-btns">
+      <button class="btn-add-prep" onclick="abrirFormulario()">＋ Agregar preparado</button>
+      <button class="btn-exit-edit" onclick="salirEdicion()">Salir ✕</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="icon">⚗️</span>¿Qué es un preparado magistral?</div>
+    <p style="font-size:14px;color:var(--gt);line-height:1.7;margin-bottom:12px">
+      Un preparado magistral es un medicamento elaborado de forma individualizada por un farmacéutico, según prescripción médica, para un paciente concreto. Se usa cuando el medicamento comercial no existe en la concentración, forma farmacéutica o combinación que el médico necesita.
+    </p>
+    <div class="list-items">
+      <div class="list-item"><span class="check">✓</span><span>Elaboración en laboratorio habilitado bajo normas ANMAT</span></div>
+      <div class="list-item"><span class="check">✓</span><span>Control de calidad de materias primas y producto terminado</span></div>
+      <div class="list-item"><span class="check">✓</span><span>Entrega en el local o en cualquiera de nuestras sucursales</span></div>
+      <div class="list-item"><span class="check">✓</span><span>Más de 42 preparados disponibles — ver catálogo completo</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="icon">📋</span>Proceso de pedido</div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Presentá tu receta médica</h4><p>En el local o enviando una foto por WhatsApp. La receta debe estar vigente y contener nombre del paciente, preparado, concentración y firma del médico.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Recibís el presupuesto</h4><p>Nuestro equipo te confirma precio, disponibilidad de materias primas y plazo de elaboración (generalmente 3–5 días hábiles).</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Elaboración en nuestro laboratorio</h4><p>Preparamos tu fórmula con materias primas de calidad, siguiendo las Buenas Prácticas de Elaboración (ANMAT).</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Retiro y entrega</h4><p>Pasás a retirar por el local o lo retira la persona que indiques presentando DNI. También podés coordinar envío.</p></div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="icon">🗂</span>Catálogo de preparados — Vademecum 2025</div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Buscar por nombre, componente, acción…" oninput="renderCatalogo()">
+    </div>
+    <div class="filter-bar" id="filterBar"></div>
+    <div class="vade-grid" id="vadeGrid"></div>
+    <p style="font-size:12px;color:var(--gm);margin-top:14px;line-height:1.5">
+      Catálogo Vademecum 2025 · Farmacia Nueva Fulchi. Si el preparado que necesitás no está en la lista, consultanos — podemos elaborar fórmulas específicas bajo prescripción médica.
+    </p>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="icon">💬</span>Hacer un pedido</div>
+    <p style="font-size:14px;color:var(--gt);margin-bottom:16px">Para hacer un pedido, envianos la receta médica por WhatsApp o presentate en el local. Te confirmamos precio y plazo de entrega a la brevedad.</p>
+    <div class="btns-row">
+      <a href="https://wa.me/5491159631267" target="_blank" class="btn-wa"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.555 4.116 1.527 5.845L.057 23.486c-.094.32.007.664.259.894.181.163.415.248.654.248.078 0 .157-.01.234-.03l5.86-1.528A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.938 0-3.77-.497-5.363-1.373l-.38-.213-3.938 1.027 1.004-3.813-.228-.374A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>Consultar por WhatsApp</a>
+      <a href="tel:01159631267" class="btn-tel">📞 011 5963-1267</a>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <strong>Farmacia Nueva Fulchi</strong> · Boulogne Sur Mer 1301, Longchamps (B1854)<br>
+    Lunes a sábado 8:30–20:30 hs · 011 5963-1267 · <a href="https://www.fullfarma.com.ar">fullfarma.com.ar</a><br>
+    <button class="edit-trigger" onclick="abrirPin('acceso')">✦ editar vademecum</button>
+  </div>
+</div>
+
+<!-- MODAL PIN -->
+<div class="modal-overlay" id="pinModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="pinTitulo">🔒 Acceso restringido</h3>
+      <button class="modal-close" onclick="cerrarModal('pinModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="pin-wrap">
+        <p class="pin-desc" id="pinDesc">Ingresá la contraseña para entrar al modo edición</p>
+        <div class="pin-dots" id="pinDots">
+          <div class="pin-dot" id="dot0"></div>
+          <div class="pin-dot" id="dot1"></div>
+          <div class="pin-dot" id="dot2"></div>
+          <div class="pin-dot" id="dot3"></div>
+        </div>
+        <div class="pin-pad">
+          <button class="pin-key" onclick="pinPress('1')">1</button>
+          <button class="pin-key" onclick="pinPress('2')">2</button>
+          <button class="pin-key" onclick="pinPress('3')">3</button>
+          <button class="pin-key" onclick="pinPress('4')">4</button>
+          <button class="pin-key" onclick="pinPress('5')">5</button>
+          <button class="pin-key" onclick="pinPress('6')">6</button>
+          <button class="pin-key" onclick="pinPress('7')">7</button>
+          <button class="pin-key" onclick="pinPress('8')">8</button>
+          <button class="pin-key" onclick="pinPress('9')">9</button>
+          <button class="pin-key del" onclick="pinBorrar()">⌫</button>
+          <button class="pin-key" onclick="pinPress('0')">0</button>
+          <button class="pin-key del" onclick="pinLimpiar()">✕</button>
+        </div>
+        <div class="pin-error" id="pinError"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FORMULARIO -->
+<div class="modal-overlay" id="formModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>➕ Nuevo preparado</h3>
+      <button class="modal-close" onclick="cerrarModal('formModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field"><label>Nombre *</label><input type="text" id="f_nombre" placeholder="Ej: Crema AAA"></div>
+      <div class="form-field"><label>Composición * (una por línea)</label><textarea id="f_comp" placeholder="Ketoconazol 2%&#10;Crema Base CSP 100g"></textarea></div>
+      <div class="form-field"><label>Acción terapéutica *</label><input type="text" id="f_accion" placeholder="Ej: Antimicótica, antibiótica y antialérgica"></div>
+      <div class="form-field"><label>Posología</label><input type="text" id="f_poso" placeholder="Ej: Aplicar 2 veces por día"></div>
+      <div class="form-field"><label>Contraindicados</label><input type="text" id="f_contra" placeholder="Ej: Personas alérgicas a sus componentes"></div>
+      <div class="r2">
+        <div class="form-field"><label>Símil</label><input type="text" id="f_simil" placeholder="Ej: Bagovit"></div>
+        <div class="form-field"><label>Presentación</label><input type="text" id="f_present" placeholder="Ej: 50g"></div>
+      </div>
+      <div class="r2">
+        <div class="form-field"><label>Vencimiento</label><input type="text" id="f_venc" placeholder="Ej: 6 meses"></div>
+        <div class="form-field">
+          <label>Categoría *</label>
+          <select id="f_cat" onchange="actualizarLabelDesdeCat()">
+            <option value="cat-piel">Piel</option>
+            <option value="cat-anti">Antimicótico</option>
+            <option value="cat-suple">Suplemento</option>
+            <option value="cat-dige">Digestivo</option>
+            <option value="cat-cosm">Cosmética</option>
+            <option value="cat-otras">Otra (especificar abajo)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-field"><label>Etiqueta de categoría</label><input type="text" id="f_catLabel" placeholder="Ej: Antiséptico, Bucal, Circulación…"></div>
+      <button class="btn-submit" onclick="guardarPreparado()">Guardar preparado</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// CONTRASEÑA — cambiar acá
+// ═══════════════════════════════════════════════════════
+const PIN = '1234';
+
+// ═══════════════════════════════════════════════════════
+// DATOS BASE (se combinan con los guardados en localStorage)
+// ═══════════════════════════════════════════════════════
+const BASE = [
+  {id:'b1', nombre:"Crema AAA", comp:["Betametasona Val 0,1%","Gentamicina Base 0,1%","Clotrimazole 1%","Crema Base CSP 100g"], accion:"Crema antimicótica, antibiótica y antialérgica.", poso:"Aplicar 2 veces por día.", contra:"Personas alérgicas a los principios activos. Diabéticos.", simil:"Macril, Vitacortil, Factor dérmico, Dermosona", present:"25g / 100g", venc:"6 meses", cat:"cat-piel", catLabel:"Piel"},
+  {id:'b2', nombre:"Crema Vit. A + Triamcinolona", comp:["Vitamina A 100.000 UI","Triamcinolona 0,1g","Glicerina C.S.","Crema Base CSP 100g"], accion:"Antialérgica y reparadora de la piel.", poso:"Aplicar 2 veces por día.", contra:"Personas alérgicas a sus componentes. Personas diabéticas.", simil:"Bagovit A plus", present:"50g", venc:"6 meses", cat:"cat-piel", catLabel:"Piel"},
+  {id:'b3', nombre:"Vitamina A Crema (tipo Bagovit)", comp:["Vitamina A Palmitato 100.000 UI","Crema Base CSP 100g"], accion:"Acción nutritiva, protectora y regeneradora de la piel.", poso:"Aplicar las veces que sea necesario.", contra:"Personas alérgicas a sus componentes.", simil:"Bagovit", present:"100g", venc:"6 meses", cat:"cat-piel", catLabel:"Piel"},
+  {id:'b4', nombre:"Crema Vit. A + Vit. E (tipo Dermaglós)", comp:["Vitamina A 600.000 UI","Alantoína 0,25g","Vit E 0,05g","Crema Base CSP 100g"], accion:"Protectora y regeneradora de la piel.", poso:"Aplicar las veces que sea necesario.", contra:"Personas alérgicas a sus componentes.", simil:"Dermaglos, Factor Ae", present:"100g", venc:"6 meses", cat:"cat-piel", catLabel:"Piel"},
+  {id:'b5', nombre:"Crema para Talones", comp:["Aloe Vera Ext Glic 10%","Vit A Palmit 10000 UI","Lanolina 10%","Crema CSP 100g"], accion:"Crema hidratante y regeneradora de la piel de los talones resecos.", poso:"Aplicar luego de la higiene, las veces que sea necesario.", contra:"Personas alérgicas a sus componentes.", simil:"", present:"50g", venc:"6 meses", cat:"cat-piel", catLabel:"Piel"},
+  {id:'b6', nombre:"Crema para Manos Agrietadas", comp:["Urea 10%","Vit A 50000 UI","Lanolina 10%","Miristato de Isopropilo 10%","Crema CSP 50g"], accion:"Crema hidratante y regeneradora.", poso:"Aplicar las veces que sea necesario.", contra:"Personas alérgicas a sus componentes.", simil:"", present:"50g", venc:"6 meses", cat:"cat-piel", catLabel:"Piel"},
+  {id:'b7', nombre:"Crema Facial Anti Age", comp:["Aloe Vera Ext Glic 10%","Vit A Palmit 10000 UI","Lanolina 10%","Crema CSP 100g"], accion:"Indicado para arrugas y líneas de expresión.", poso:"Aplicar todas las noches luego de la limpieza facial.", contra:"Personas alérgicas a sus componentes.", simil:"", present:"25g", venc:"6 meses", cat:"cat-cosm", catLabel:"Cosmética"},
+  {id:'b8', nombre:"Crema Antimicótica", comp:["Ketoconazol 2%","Crema Base CSP 100g"], accion:"Crema antimicótica.", poso:"Aplicar 2 veces por día.", contra:"Alergia a alguno de los componentes.", simil:"", present:"50g", venc:"6 meses", cat:"cat-anti", catLabel:"Antimicótico"},
+  {id:'b9', nombre:"Crema Ungueal", comp:["Bifonazol 1%","Unguento 20g","Urea 30%"], accion:"Antimicótico de uso tópico para uñas.", poso:"Aplicar sobre la uña afectada.", contra:"Personas alérgicas. Menores de 12 años. Diabéticos.", simil:"Unesia", present:"20g", venc:"1 año", cat:"cat-anti", catLabel:"Antimicótico"},
+  {id:'b10', nombre:"Talco Antimicótico", comp:["Clotrimazole 1g","Exc CSP 100g"], accion:"Antimicótico de uso externo.", poso:"Espolvorear en la zona afectada 1 a 2 veces.", contra:"", simil:"", present:"50g", venc:"1 año", cat:"cat-anti", catLabel:"Antimicótico"},
+  {id:'b11', nombre:"Diclofenac Gel", comp:["Diclofenac Dietilamina 1,2%","Ext. Fl. Arnica 8%","Gel CSP"], accion:"Acción antiinflamatoria y analgésica localizada.", poso:"Aplicar las veces que sea necesario.", contra:"Personas alérgicas a sus componentes.", simil:"Diclofenac gel", present:"50g / 100g", venc:"6 meses", cat:"cat-otras", catLabel:"Antiinflamatorio"},
+  {id:'b12', nombre:"Acné Loción", comp:["Ac. Salicílico 1,0%","Resorcina 2,0%","Cloranfenicol 0,5%"], accion:"Anti-acneico, antibacteriano, antiseborreico y queratolítico.", poso:"Aplicar a la noche después de la limpieza de la piel.", contra:"Alergia a alguno de los componentes. Personas diabéticas.", simil:"Acnoxin", present:"100ml", venc:"6 meses", cat:"cat-piel", catLabel:"Piel"},
+  {id:'b13', nombre:"Vaselina Salicilada", comp:["Ac. Salicílico 10%","Vaselina Sólida CSP 100g"], accion:"Queratolítico indicado en ictiosis, psoriasis, hiperqueratosis, papilomas.", poso:"Aplicar en la zona afectada 2 a 3 veces por día.", contra:"Personas alérgicas. Diabéticos o con alteraciones en circulación periférica.", simil:"", present:"100g", venc:"1 año", cat:"cat-piel", catLabel:"Piel"},
+  {id:'b14', nombre:"Vaselina Azufrada", comp:["Azufre PP (2% / 3% / 5% / 6%)","Vaselina Sólida CSP 100g"], accion:"Ectoparasiticida.", poso:"Según indicación médica.", contra:"Personas alérgicas a sus componentes.", simil:"", present:"100g", venc:"1 año", cat:"cat-otras", catLabel:"Antiparasitario"},
+  {id:'b15', nombre:"Champú Anticaspa", comp:["Ketoconazole 1%"], accion:"Anticaspa.", poso:"Lavar el cabello, dejar actuar unos minutos y enjuagar.", contra:"Personas alérgicas a sus componentes.", simil:"", present:"120ml", venc:"6 meses", cat:"cat-anti", catLabel:"Antimicótico"},
+  {id:'b16', nombre:"Pediculicida Plus", comp:["Ivermectina 1%","Crema de Enjuague 100ml"], accion:"Pediculicida con ivermectina.", poso:"Lavar con champú, secar, aplicar desde la raíz. Dejar 15 min, pasar peine fino y enjuagar.", contra:"Personas alérgicas. Menores de 5 años.", simil:"", present:"100ml", venc:"6 meses", cat:"cat-otras", catLabel:"Antipiojos"},
+  {id:'b17', nombre:"Pediculicida", comp:["Ipermetrina 1%","Crema de Enjuague 100ml"], accion:"Pediculicida.", poso:"Lavar con champú, secar, aplicar desde la raíz. Dejar 15 min, pasar peine fino y enjuagar.", contra:"Personas alérgicas. Menores de 2 años.", simil:"Kinderval", present:"100ml", venc:"6 meses", cat:"cat-otras", catLabel:"Antipiojos"},
+  {id:'b18', nombre:"Iodopovidona Solución", comp:["Iodopovidona Solución al 10%"], accion:"Antiséptico de la piel de uso general.", poso:"Después de lavar y secar, aplicar sobre la zona afectada 2 a 3 veces al día.", contra:"Trastornos de la glándula tiroidea y menores de 5 años.", simil:"Pervinox", present:"60ml / 100ml", venc:"1 año", cat:"cat-otras", catLabel:"Antiséptico"},
+  {id:'b19', nombre:"Clorhexidina 2% / 4%", comp:["Clorhexidina C.S.","Alcohol Sol. Hidroalcohólica C.S.P."], accion:"Antiséptico y desinfectante. Al 4% uso veterinario.", poso:"Limpiar y secar la herida. Aplicar 1 a 2 veces al día.", contra:"Hipersensibilidad al principio activo. No usar en ojos, oídos ni mucosas.", simil:"Pervinox antiséptico", present:"Al 4% sol x200ml · Al 2% spray x50ml", venc:"1 año", cat:"cat-otras", catLabel:"Antiséptico"},
+  {id:'b20', nombre:"Aftas (Pomada)", comp:["Triamcinolona 0,1%","Lidocaína 5%","Oro Base CSP 100g"], accion:"Pomada mucoadhesiva para aftas.", poso:"Aplicar 3 veces por día.", contra:"Niños, diabéticos y personas alérgicas.", simil:"", present:"20g", venc:"1 año", cat:"cat-otras", catLabel:"Bucal"},
+  {id:'b21', nombre:"Pasta Bebé Plus", comp:["Vit A 1.000.000 UI","Ac. Hígado de Bacalao 2%","Ac. Bórico 2%","Pasta Base CSP 100g"], accion:"Acción cicatrizante y regeneradora de los tejidos.", poso:"Después de limpiar la zona del bebé, aplicar en capa gruesa.", contra:"Alergia a alguno de los componentes.", simil:"Hipoglós", present:"60g", venc:"1 año", cat:"cat-piel", catLabel:"Pediatría"},
+  {id:'b22', nombre:"Crema para Escaras", comp:["Ac. Hialurónico 0,5%","Ácidos Grasos Esenciales (AGE) 15%","Crema Base CSP 100g"], accion:"Cicatrizante y epitelizante.", poso:"Aplicar 2 a 3 veces por día.", contra:"Alergia a alguno de los componentes.", simil:"", present:"50g", venc:"6 meses", cat:"cat-piel", catLabel:"Heridas"},
+  {id:'b23', nombre:"Gotas Hepáticas", comp:["Ext. de Alcachofas 25%","Ext. Boldo 20%","Ext. Carqueja 10%","Tintura de Beleño 5%","Tintura de Belladoba 5%"], accion:"Digestivo, colerético, colagogo.", poso:"30 gotas en un vaso con agua, antes, durante o después de las comidas.", contra:"Alergia a sus componentes. Menores de 6 años. Enfermedad grave del hígado.", simil:"Hepatalgina", present:"60ml / 100ml", venc:"6 meses", cat:"cat-dige", catLabel:"Digestivo"},
+  {id:'b24', nombre:"Gotas Laxantes", comp:["Picosulfato de Sodio 0,75g","Solución Oral CSP 100ml"], accion:"Laxante.", poso:"Adultos: 15–30 gotas antes de acostarse. Niños: 5–15 gotas antes de acostarse.", contra:"Personas alérgicas. Apendicitis. Oclusión intestinal.", simil:"", present:"20ml", venc:"6 meses", cat:"cat-dige", catLabel:"Digestivo"},
+  {id:'b25', nombre:"Cáps. Benzopirona + Escina", comp:["Benzopirona 30mg","Escina 20mg","Rutina 200mg","Furosemida 25mg"], accion:"Flebotónico, diurético.", poso:"1 cápsula diaria.", contra:"Alergia a alguno de los componentes.", simil:"", present:"Cápsulas", venc:"6 meses", cat:"cat-otras", catLabel:"Circulación"},
+  {id:'b26', nombre:"Pomada Sabañones", comp:["Ictiol 5%","Mentol 1%","Alcanfor 1%"], accion:"Tratamiento de sabañones.", poso:"Aplicar 2 veces por día.", contra:"Personas alérgicas a sus componentes.", simil:"", present:"20g", venc:"1 año", cat:"cat-otras", catLabel:"Circulación"},
+  {id:'b27', nombre:"Magnesio Citrato Cápsulas", comp:["Magnesio Citrato 300mg"], accion:"Suplemento dietario. Favorece huesos, trabajo muscular, reduce estrés, fatiga, ansiedad e insomnio.", poso:"1 cápsula diaria.", contra:"Alergia a alguno de los componentes.", simil:"", present:"Cápsulas", venc:"6 meses", cat:"cat-suple", catLabel:"Suplemento"},
+  {id:'b28', nombre:"Cáps. Arándanos + Vit. C", comp:["Ext. Seco Arándanos 400mg","Vit C 300mg"], accion:"Antiinflamatorio urinario. Profilaxis de infecciones urinarias.", poso:"2 cápsulas diarias.", contra:"Alergia a alguno de los componentes.", simil:"", present:"Cápsulas", venc:"6 meses", cat:"cat-suple", catLabel:"Suplemento"},
+  {id:'b29', nombre:"Cáps. Ginkgo Biloba + Ajo + Zinc", comp:["Ginkgo Biloba 60mg","Ext. Seco Ajo 50mg","Zinc 10mg"], accion:"Suplemento antioxidante. Mejora la circulación cerebral y arterial.", poso:"1 cápsula diaria.", contra:"Alergia a alguno de los componentes.", simil:"", present:"Cápsulas", venc:"6 meses", cat:"cat-suple", catLabel:"Suplemento"},
+  {id:'b30', nombre:"Cáps. Complejo Vit. B", comp:["Vit B1 (Tiamina) 15mg","Vit B6 (Piridoxina) 15mg","Vit B12 (Cianocobalamina) 15µg"], accion:"Prevención y tratamiento de deficiencias de vitaminas del complejo B.", poso:"1 a 2 cápsulas diarias.", contra:"Hipersensibilidad a alguno de los componentes.", simil:"", present:"Cápsulas", venc:"6 meses", cat:"cat-suple", catLabel:"Suplemento"},
+  {id:'b31', nombre:"Cáps. Anticelulíticas", comp:["Ext. Seco Centella Asiática 100mg","Carnitina 150mg","Cafeína 50mg"], accion:"Activa la circulación y acelera el metabolismo de las grasas.", poso:"2 cápsulas diarias (1 al mediodía y 1 a la tarde).", contra:"Alergia a alguno de los componentes. Hipertensos.", simil:"", present:"Cápsulas", venc:"6 meses", cat:"cat-cosm", catLabel:"Cosmética"},
+  {id:'b32', nombre:"Crema de Borato de Sodio 3%", comp:["Borato de Sodio 3%","Crema Base CSP 100g"], accion:"Para cándida vaginal y equilibrio de pH.", poso:"Según indicación médica.", contra:"Personas alérgicas a sus componentes.", simil:"", present:"25g", venc:"6 meses", cat:"cat-otras", catLabel:"Ginecología"},
+  {id:'b33', nombre:"Pomada Callicida", comp:["Ac. Salicílico","Ac. Acético","Ac. Láctico","Lanolina"], accion:"Callicida.", poso:"Aplicar sobre la lesión.", contra:"Personas alérgicas. Diabéticos y anticoagulados.", simil:"", present:"20g", venc:"1 año", cat:"cat-piel", catLabel:"Piel"},
+  {id:'b34', nombre:"Nafazolina Gotas", comp:["Nafazolina Clorhidrato 0,1g"], accion:"Descongestivo nasal.", poso:"Adultos y niños mayores de 12 años: 2 gotas cada 12 hs.", contra:"Niños menores de 12. Personas alérgicas. Rinitis atrófica. Evitar en lactancia y embarazo.", simil:"Rhinal / Nafazolex", present:"100ml", venc:"6 meses", cat:"cat-otras", catLabel:"Respiratorio"},
+  {id:'b35', nombre:"Glucosa Anhidra", comp:["Glucosa Anhidra 75g"], accion:"Para diagnóstico, según indicación médica.", poso:"Según indicación médica.", contra:"Diabéticos.", simil:"", present:"75g", venc:"6 meses", cat:"cat-otras", catLabel:"Diagnóstico"},
+  {id:'b36', nombre:"Glicerina Pura", comp:["Glicerina Pura"], accion:"Humectante.", poso:"Aplicar en zona necesaria.", contra:"Personas alérgicas a sus componentes.", simil:"", present:"100g", venc:"1 año", cat:"cat-piel", catLabel:"Piel"},
+  {id:'b37', nombre:"Azufre en Polvo", comp:["Azufre en Polvo 25g"], accion:"Según criterio médico.", poso:"Según indicación médica.", contra:"", simil:"", present:"25g", venc:"1 año", cat:"cat-otras", catLabel:"Dermatología"},
+  {id:'b38', nombre:"Ginkgo Biloba Cápsulas", comp:["Ginkgo Biloba 80mg"], accion:"Neurotónico cerebral.", poso:"1 cápsula diaria.", contra:"Alergia a alguno de los componentes.", simil:"", present:"Cápsulas", venc:"6 meses", cat:"cat-suple", catLabel:"Suplemento"},
+  {id:'b39', nombre:"Solución Jabonosa Iodopovidona 5%", comp:["Solución Jabonosa Iodopovidona 5%"], accion:"Jabón antiséptico.", poso:"Aplicar y frotar 2–5 minutos hasta obtener espuma. Enjuagar.", contra:"Alergia al sistema.", simil:"Pervinox", present:"100ml", venc:"1 año", cat:"cat-otras", catLabel:"Antiséptico"},
+];
+
+// ═══════════════════════════════════════════════════════
+// STORAGE — combina base con extras guardados
+// ═══════════════════════════════════════════════════════
+const STORAGE_KEY = 'fulchi_vademecum_extras';
+const DELETED_KEY = 'fulchi_vademecum_deleted';
+
+function cargarExtras() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e){ return []; }
+}
+function guardarExtras(arr) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+}
+function cargarEliminados() {
+  try { return JSON.parse(localStorage.getItem(DELETED_KEY)) || []; } catch(e){ return []; }
+}
+function guardarEliminados(arr) {
+  localStorage.setItem(DELETED_KEY, JSON.stringify(arr));
+}
+
+function getCatalogo() {
+  const eliminados = cargarEliminados();
+  const base = BASE.filter(p => !eliminados.includes(p.id));
+  const extras = cargarExtras();
+  return [...base, ...extras];
+}
+
+// ═══════════════════════════════════════════════════════
+// ESTADO
+// ═══════════════════════════════════════════════════════
+let filtroActivo = '';
+let modoEdicion = false;
+let pinAccion = ''; // 'acceso' | 'eliminar'
+let eliminarId = null;
+let pinActual = '';
+
+// ═══════════════════════════════════════════════════════
+// RENDER CATÁLOGO
+// ═══════════════════════════════════════════════════════
+function renderCatalogo() {
+  const catalogo = getCatalogo();
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const grid = document.getElementById('vadeGrid');
+
+  // Filtrar
+  const items = catalogo.filter(p => {
+    const passFilter = filtroActivo === '' || p.catLabel === filtroActivo;
+    if (!passFilter) return false;
+    if (q === '') return true;
+    return (
+      p.nombre.toLowerCase().includes(q) ||
+      p.accion.toLowerCase().includes(q) ||
+      p.catLabel.toLowerCase().includes(q) ||
+      (p.simil && p.simil.toLowerCase().includes(q)) ||
+      (p.contra && p.contra.toLowerCase().includes(q)) ||
+      p.comp.some(c => c.toLowerCase().includes(q))
+    );
+  });
+
+  if (items.length === 0) {
+    grid.innerHTML = '<div class="no-results">😕 No se encontraron preparados con esos criterios.</div>';
+    renderFiltros(catalogo);
+    return;
+  }
+
+  grid.innerHTML = items.map(p => {
+    const compHTML = p.comp.map(c => `<span class="detail-comp">${c}</span>`).join('');
+    const rows = [
+      ['Composición', compHTML],
+      ['Acción', p.accion],
+      p.poso   ? ['Posología',       p.poso] : null,
+      p.contra ? ['Contraindicados', `<span class="detail-warn">${p.contra}</span>`] : null,
+      p.simil  ? ['Símil',           `<span class="detail-simil">${p.simil}</span>`] : null,
+      p.present? ['Presentación',    p.present] : null,
+      p.venc   ? ['Vencimiento',     p.venc] : null,
+    ].filter(Boolean).map(([lbl,val]) =>
+      `<div class="detail-row"><div class="detail-label">${lbl}</div><div class="detail-val">${val}</div></div>`
+    ).join('');
+
+    const editActions = modoEdicion
+      ? `<div class="edit-actions"><button class="btn-eliminar" onclick="pedirEliminar('${p.id}','${p.nombre.replace(/'/g,"\\'")}')">🗑 Eliminar este preparado</button></div>`
+      : '';
+
+    return `
+    <div class="vade-card${modoEdicion?' edit-mode':''}" id="card_${p.id}">
+      <div class="vade-header" onclick="toggleCard('${p.id}')">
+        <div class="vade-header-left">
+          <div class="vname">${p.nombre}</div>
+          <div class="vcap">${p.accion.length > 60 ? p.accion.slice(0,60)+'…' : p.accion}</div>
+          <span class="vade-cat ${p.cat}">${p.catLabel}</span>
+        </div>
+        <span class="vade-chevron" id="chev_${p.id}">▼</span>
+      </div>
+      <div class="vade-detail" id="det_${p.id}">
+        ${rows}
+        ${editActions}
+      </div>
+    </div>`;
+  }).join('');
+
+  renderFiltros(catalogo);
+}
+
+function toggleCard(id) {
+  const card = document.getElementById('card_' + id);
+  const wasOpen = card.classList.contains('expanded');
+  document.querySelectorAll('.vade-card.expanded').forEach(c => c.classList.remove('expanded'));
+  if (!wasOpen) card.classList.add('expanded');
+}
+
+// ═══════════════════════════════════════════════════════
+// FILTROS DINÁMICOS — solo muestra categorías que tienen al menos 1 preparado
+// ═══════════════════════════════════════════════════════
+function renderFiltros(catalogo) {
+  if (!catalogo) catalogo = getCatalogo();
+  const bar = document.getElementById('filterBar');
+
+  // Contar cuántos preparados tiene cada catLabel
+  const conteo = {};
+  catalogo.forEach(p => { conteo[p.catLabel] = (conteo[p.catLabel] || 0) + 1; });
+
+  // Solo mostrar categorías con al menos 1 preparado
+  const labels = Object.keys(conteo).sort((a, b) => a.localeCompare(b, 'es'));
+
+  // Si el filtro activo ya no existe (porque se eliminaron todos sus productos), reset
+  if (filtroActivo !== '' && !conteo[filtroActivo]) filtroActivo = '';
+
+  bar.innerHTML =
+    `<button class="filter-btn${filtroActivo===''?' active':''}" onclick="setFilter('')">Todos (${catalogo.length})</button>` +
+    labels.map(label =>
+      `<button class="filter-btn${filtroActivo===label?' active':''}" onclick="setFilter('${label}')">${label} (${conteo[label]})</button>`
+    ).join('');
+}
+
+function setFilter(cat) {
+  filtroActivo = cat;
+  renderCatalogo();
+}
+
+// ═══════════════════════════════════════════════════════
+// MODO EDICIÓN
+// ═══════════════════════════════════════════════════════
+function activarEdicion() {
+  modoEdicion = true;
+  document.getElementById('editBanner').classList.add('visible');
+  renderCatalogo();
+}
+
+function salirEdicion() {
+  modoEdicion = false;
+  document.getElementById('editBanner').classList.remove('visible');
+  renderCatalogo();
+}
+
+// ═══════════════════════════════════════════════════════
+// PIN
+// ═══════════════════════════════════════════════════════
+function abrirPin(accion, id, nombre) {
+  pinAccion = accion;
+  eliminarId = id || null;
+  pinActual = '';
+  updateDots();
+  document.getElementById('pinError').textContent = '';
+  if (accion === 'acceso') {
+    document.getElementById('pinTitulo').textContent = '🔒 Modo edición';
+    document.getElementById('pinDesc').textContent = 'Ingresá la contraseña para activar el modo edición';
+  } else {
+    document.getElementById('pinTitulo').textContent = '🗑 Eliminar preparado';
+    document.getElementById('pinDesc').textContent = `Ingresá la contraseña para eliminar "${nombre}"`;
+  }
+  document.getElementById('pinModal').classList.add('open');
+}
+
+function pinPress(d) {
+  if (pinActual.length >= 4) return;
+  pinActual += d;
+  updateDots();
+  if (pinActual.length === 4) setTimeout(verificarPin, 150);
+}
+function pinBorrar() { pinActual = pinActual.slice(0,-1); updateDots(); }
+function pinLimpiar() { pinActual = ''; updateDots(); document.getElementById('pinError').textContent = ''; }
+
+function updateDots() {
+  for (let i = 0; i < 4; i++) {
+    const d = document.getElementById('dot' + i);
+    d.classList.toggle('filled', i < pinActual.length);
+    d.classList.remove('error');
+  }
+}
+
+function verificarPin() {
+  if (pinActual === PIN) {
+    cerrarModal('pinModal');
+    if (pinAccion === 'acceso') {
+      activarEdicion();
+    } else if (pinAccion === 'eliminar') {
+      ejecutarEliminar();
+    }
+  } else {
+    document.getElementById('pinError').textContent = 'Contraseña incorrecta. Intentá de nuevo.';
+    for (let i = 0; i < 4; i++) {
+      const d = document.getElementById('dot' + i);
+      d.classList.add('error'); d.classList.remove('filled');
+    }
+    setTimeout(() => {
+      pinActual = '';
+      updateDots();
+      for (let i = 0; i < 4; i++) document.getElementById('dot' + i).classList.remove('error');
+    }, 1000);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// ELIMINAR
+// ═══════════════════════════════════════════════════════
+function pedirEliminar(id, nombre) {
+  abrirPin('eliminar', id, nombre);
+}
+
+function ejecutarEliminar() {
+  if (!eliminarId) return;
+  const nombre = getCatalogo().find(p => p.id === eliminarId)?.nombre || '';
+
+  // ¿Es de la base o es extra?
+  if (eliminarId.startsWith('b')) {
+    // Guardar en lista de eliminados
+    const del = cargarEliminados();
+    if (!del.includes(eliminarId)) { del.push(eliminarId); guardarEliminados(del); }
+  } else {
+    // Eliminar de extras
+    const extras = cargarExtras().filter(p => p.id !== eliminarId);
+    guardarExtras(extras);
+  }
+
+  eliminarId = null;
+  filtroActivo = '';
+  renderCatalogo();
+  toast(`🗑 "${nombre}" eliminado del vademecum`, '#791F1F');
+}
+
+// ═══════════════════════════════════════════════════════
+// AGREGAR
+// ═══════════════════════════════════════════════════════
+function abrirFormulario() {
+  ['f_nombre','f_comp','f_accion','f_poso','f_contra','f_simil','f_present','f_venc','f_catLabel']
+    .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f_cat').value = 'cat-piel';
+  document.getElementById('f_catLabel').value = 'Piel';
+  cerrarModal('formModal'); // por si estaba abierto
+  document.getElementById('formModal').classList.add('open');
+}
+
+function actualizarLabelDesdeCat() {
+  const map = {'cat-piel':'Piel','cat-anti':'Antimicótico','cat-suple':'Suplemento','cat-dige':'Digestivo','cat-cosm':'Cosmética','cat-otras':''};
+  const val = document.getElementById('f_cat').value;
+  document.getElementById('f_catLabel').value = map[val] || '';
+}
+
+function guardarPreparado() {
+  const nombre  = document.getElementById('f_nombre').value.trim();
+  const compRaw = document.getElementById('f_comp').value.trim();
+  const accion  = document.getElementById('f_accion').value.trim();
+  if (!nombre || !compRaw || !accion) { alert('Completá los campos obligatorios (*)'); return; }
+
+  const catVal = document.getElementById('f_cat').value;
+  const catLabelRaw = document.getElementById('f_catLabel').value.trim();
+  const catLabel = catLabelRaw || {'cat-piel':'Piel','cat-anti':'Antimicótico','cat-suple':'Suplemento','cat-dige':'Digestivo','cat-cosm':'Cosmética','cat-otras':'Otra'}[catVal];
+
+  const nuevo = {
+    id: 'e_' + Date.now(),
+    nombre, accion, catVal, catLabel, cat: catVal,
+    comp:    compRaw.split('\n').map(s => s.trim()).filter(Boolean),
+    poso:    document.getElementById('f_poso').value.trim(),
+    contra:  document.getElementById('f_contra').value.trim(),
+    simil:   document.getElementById('f_simil').value.trim(),
+    present: document.getElementById('f_present').value.trim(),
+    venc:    document.getElementById('f_venc').value.trim(),
+  };
+
+  const extras = cargarExtras();
+  extras.push(nuevo);
+  guardarExtras(extras);
+  cerrarModal('formModal');
+  renderCatalogo();
+  toast(`✓ "${nombre}" agregado al vademecum`, '#27500A');
+}
+
+// ═══════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════
+function cerrarModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function toast(msg, bg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.style.background = bg;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+document.addEventListener('click', e => {
+  ['pinModal','formModal'].forEach(id => {
+    if (e.target === document.getElementById(id)) cerrarModal(id);
+  });
+});
+
+// ─── INIT ───────────────────────────────────────────────
+renderCatalogo();
+</script>
+</body>
+</html>
