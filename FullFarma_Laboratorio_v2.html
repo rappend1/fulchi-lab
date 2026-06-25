@@ -25,7 +25,7 @@ body{font-family:var(--f);background:#f5f4f0;color:var(--gt);min-height:100vh}
 .pin-logo svg{width:30px;height:30px;stroke:var(--verde);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .pin-title{font-size:18px;font-weight:700;color:var(--negro);margin-bottom:4px;text-align:center}
 .pin-sub{font-size:13px;color:var(--gm);margin-bottom:24px;text-align:center}
-.pin-dots{display:flex;gap:12px;margin-bottom:20px}
+.pin-dots{display:flex;gap:12px;margin-bottom:20px;justify-content:center}
 .pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--gb);background:var(--blanco);transition:all .15s}
 .pin-dot.filled{background:var(--vmid);border-color:var(--vmid)}
 .pin-dot.wrong{background:var(--rojo);border-color:var(--rojo)}
@@ -104,11 +104,11 @@ textarea{min-height:72px;resize:vertical;line-height:1.5}
 
 /* opt cards */
 .og{display:flex;flex-direction:column;gap:5px}
-.oc{display:flex;align-items:center;gap:9px;padding:9px 11px;border:1px solid var(--gb);border-radius:8px;cursor:pointer;transition:border-color .15s,background .15s;background:var(--blanco);-webkit-tap-highlight-color:transparent}
+.oc{display:flex;align-items:center;gap:10px;padding:11px 13px;border:1.5px solid var(--gb);border-radius:10px;cursor:pointer;transition:border-color .15s,background .15s;background:var(--blanco);-webkit-tap-highlight-color:transparent}
 .oc:hover{border-color:var(--ab)}
 .oc input{width:auto;padding:0;border:none;box-shadow:none;accent-color:var(--verde)}
-.oc.sv{border-color:var(--vb);background:var(--vbg)}
-.oc.sam{border-color:var(--abb);background:var(--ambg)}
+.oc.sv{border-color:var(--vmid);background:var(--vbg)}
+.oc.sam{border-color:var(--vmid);background:var(--vbg)}
 .ol{font-size:13px;color:var(--negro)}
 .os{font-size:10px;color:var(--gm);margin-top:1px}
 
@@ -331,6 +331,8 @@ html,body{height:100%;font-family:var(--f);background:var(--gl);color:var(--gt)}
 .col[data-col="recibido"] .col-count{background:#E3F2FD;color:#1565C0}
 .col[data-col="presupuestado"] .col-dot{background:var(--abb)}
 .col[data-col="presupuestado"] .col-count{background:var(--ambg);color:var(--am)}
+.col[data-col="confirmado"] .col-dot{background:#4CAF50}
+.col[data-col="confirmado"] .col-count{background:#E8F5E9;color:#2E7D32}
 .col[data-col="elaboracion"] .col-dot{background:var(--vib)}
 .col[data-col="elaboracion"] .col-count{background:var(--vibg);color:var(--violeta)}
 .col[data-col="listo"] .col-dot{background:var(--vmid)}
@@ -425,6 +427,7 @@ html,body{height:100%;font-family:var(--f);background:var(--gl);color:var(--gt)}
 .status-pill.active{border-width:2px}
 .status-pill[data-s="recibido"].active{background:#E3F2FD;border-color:#1565C0;color:#1565C0}
 .status-pill[data-s="presupuestado"].active{background:var(--ambg);border-color:var(--am);color:var(--am)}
+.status-pill[data-s="confirmado"].active{background:#E8F5E9;border-color:#2E7D32;color:#2E7D32}
 .status-pill[data-s="elaboracion"].active{background:var(--vibg);border-color:var(--violeta);color:var(--violeta)}
 .status-pill[data-s="listo"].active{background:var(--vbg);border-color:var(--verde);color:var(--verde)}
 .status-pill[data-s="entregado"].active{background:var(--gl);border-color:var(--gm);color:var(--gm)}
@@ -571,7 +574,7 @@ html,body{height:100%;font-family:var(--f);background:var(--gl);color:var(--gt)}
     <div class="tab on" id="t-form" onclick="st('form')">Nuevo pedido</div>
     <div class="tab" id="t-hist" onclick="st('hist')">Historial</div>
     <div class="tab" id="t-vade" onclick="st('vade')">Vademecum</div>
-    <div class="tab" id="t-kanban" onclick="st('kanban')">🗂 Tablero</div>
+    <div class="tab" id="t-kanban" onclick="st('kanban')">Tablero</div>
   </div>
 
   <!-- ── TAB FORMULARIO ── -->
@@ -614,11 +617,16 @@ html,body{height:100%;font-family:var(--f);background:var(--gl);color:var(--gt)}
             <select id="receta" required onchange="onRecetaChange()">
               <option value="">Seleccionar...</option>
               <option value="Si">Sí</option>
-              <option value="No">No — fórmula libre</option>
+              <option value="No">No</option>
             </select>
-            <div id="formulaField" class="formula-field">
-              <strong>Fórmula magistral (sin receta):</strong><br>
-              <textarea id="formulaLibre" placeholder="Describí la fórmula completa: componentes, concentraciones y forma farmacéutica&#10;Ej: Vaselina azufrada 5% · 100g" style="margin-top:6px;font-size:12px;min-height:64px;background:var(--blanco);border:1px solid var(--vb);border-radius:7px;padding:8px 10px;resize:vertical;width:100%;font-family:var(--f)"></textarea>
+            <div id="fotoRecetaField" style="display:none;margin-top:8px">
+              <label style="font-size:12px;font-weight:500;color:var(--negro);display:block;margin-bottom:4px">Foto de la receta</label>
+              <div style="border:2px dashed var(--vb);border-radius:9px;padding:14px;text-align:center;background:var(--vbg);cursor:pointer" onclick="document.getElementById('fotoReceta').click()">
+                <div id="fotoPreview" style="display:none"><img id="fotoImg" style="max-width:100%;max-height:180px;border-radius:7px;margin-bottom:6px"><br></div>
+                <span id="fotoLabel" style="font-size:12px;color:var(--verde)">📷 Tocar para adjuntar foto</span>
+              </div>
+              <input type="file" id="fotoReceta" accept="image/*" capture="environment" style="display:none" onchange="onFotoChange(this)">
+              <div id="fotoNombre" style="font-size:11px;color:var(--gm);margin-top:4px"></div>
             </div>
           </div>
         </div>
@@ -902,7 +910,7 @@ html,body{height:100%;font-family:var(--f);background:var(--gl);color:var(--gt)}
       <input type="text" id="f-prep" placeholder="Ej: Crema AAA, Vaselina azufrada 5%...">
     </div>
     <div class="row-2">
-      <div class="field">
+      <div class="field" id="fsucField">
         <label>Sucursal <span class="req">*</span></label>
         <select id="f-suc">
           <option value="">Seleccionar...</option>
@@ -1209,7 +1217,7 @@ function sr(card,name,val){
     const p=r.closest('.oc');if(p)p.classList.remove('sv','sam');
   });
   const r=card.querySelector('input[type=radio]');if(r)r.checked=true;
-  card.classList.add(['normal','sucursal','coordinado'].includes(val)?'sv':'sam');
+  card.classList.add('sv');
 }
 function toggleRetiraFields(val){
   const show = (val==='sucursal'||val==='cliente');
@@ -1355,8 +1363,20 @@ function showPrepCard(p){
 // ── RECETA CHANGE ─────────────────────────────────────────────────────────
 function onRecetaChange(){
   const val = document.getElementById('receta').value;
-  const ff  = document.getElementById('formulaField');
-  if(ff) ff.style.display = val==='No' ? 'block' : 'none';
+  const fotoField = document.getElementById('fotoRecetaField');
+  if(fotoField) fotoField.style.display = val==='Si' ? 'block' : 'none';
+}
+function onFotoChange(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('fotoImg').src = e.target.result;
+    document.getElementById('fotoPreview').style.display = 'block';
+    document.getElementById('fotoLabel').textContent = '✓ Foto cargada — tocar para cambiar';
+    document.getElementById('fotoNombre').textContent = file.name;
+  };
+  reader.readAsDataURL(file);
 }
 
 // ── SUMMARY ────────────────────────────────────────────────────────────────
@@ -1369,7 +1389,7 @@ function buildSum(){
       <div class="srow"><span class="sk">Encargado por</span><span class="sv2">${g('encargado')}</span></div>
       <div class="srow"><span class="sk">Fecha</span><span class="sv2">${g('fecha')}</span></div>
       <div class="srow"><span class="sk">Tiene receta</span><span class="sv2">${g('receta')}</span></div>
-      ${g('formulaLibre')?`<div class="srow"><span class="sk">Fórmula libre</span><span class="sv2" style="font-style:italic">${g('formulaLibre')}</span></div>`:''}
+
       <div class="srow"><span class="sk">WhatsApp previo</span><span class="sv2">${g('tieneWA')}</span></div>
     </div>
     <div class="scard"><div class="schdr">Preparado</div>
@@ -1395,7 +1415,7 @@ function submitForm(){
   const rec={
     id,ts:now.toISOString(),estado:'pendiente',
     sucursal:g('sucursal'),encargado:g('encargado'),fecha:g('fecha'),
-    receta:g('receta'),formulaLibre:g('formulaLibre'),tieneWA:g('tieneWA'),
+    receta:g('receta'),tieneWA:g('tieneWA'),
     preparado:g('preparado'),esNuevo:prepEsNuevo,
     cantidad:g('cantidad'),
     presentacion:prepEsNuevo?g('presentacionNueva'):g('presentacion'),
@@ -1708,12 +1728,12 @@ function eliminarVade(uid, nombre){
 function exportXLS(){
   const recs = getRecs();
   if(!recs.length){ toast('No hay pedidos para exportar'); return; }
-  const headers = ['ID','Fecha','Sucursal','Encargado','Receta','Fórmula libre','WhatsApp previo',
+  const headers = ['ID','Fecha','Sucursal','Encargado','Receta','WhatsApp previo',
     'Preparado','Es nuevo','Cantidad','Presentación','Concentración','Indicaciones',
     'Urgencia','Retira','Nombre retira','DNI retira','Observaciones','Estado'];
   const rows = recs.map(r=>[
     r.id, r.fecha||r.ts?.split('T')[0]||'', r.sucursal, r.encargado,
-    r.receta, r.formulaLibre||'', r.tieneWA,
+    r.receta, r.tieneWA,
     r.preparado, r.esNuevo?'Sí':'No', r.cantidad, r.presentacion,
     r.concentracion||'', r.indicaciones||'',
     r.urgencia, r.retira||'', r.retiraNombre||'', r.retiraDNI||'',
@@ -1778,6 +1798,7 @@ const KEY = 'ff_kanban_v1';
 const COLS = [
   {id:'recibido',    name:'Recibido',      eta:'Mismo día',         dot:'#64b5f6'},
   {id:'presupuestado',name:'Presupuestado',eta:'1–2 días',          dot:'#FAC775'},
+  {id:'confirmado',  name:'Confirmado',    eta:'Presupuesto aceptado',dot:'#4CAF50'},
   {id:'elaboracion', name:'En elaboración',eta:'2–4 días',          dot:'#B5B0F5'},
   {id:'listo',       name:'Listo',         eta:'Avisar a sucursal', dot:'#639922'},
   {id:'entregado',   name:'Entregado',     eta:'Cerrado',           dot:'#888780'},
@@ -2098,13 +2119,27 @@ function deleteCard(){
 }
 
 // ── CREATE FORM ────────────────────────────────────────────────────────────
-function openForm(){ document.getElementById('formModal').classList.add('open'); }
+function openForm(){
+  // Preseleccionar sucursal si no es laboratorio
+  const fSuc = document.getElementById('f-suc');
+  const fSucField = document.getElementById('fsucField');
+  if(!isLab && currentSuc){
+    fSuc.value = currentSuc;
+    fSuc.disabled = true;
+    if(fSucField) fSucField.style.display = 'none';
+  } else {
+    fSuc.disabled = false;
+    fSuc.value = '';
+    if(fSucField) fSucField.style.display = 'block';
+  }
+  document.getElementById('formModal').classList.add('open');
+}
 function closeForm(e){ if(e.target===document.getElementById('formModal')) closeFormDirect(); }
 function closeFormDirect(){ document.getElementById('formModal').classList.remove('open'); }
 
 function createCard(){
   const prep = document.getElementById('f-prep').value.trim();
-  const suc  = document.getElementById('f-suc').value;
+  const suc  = document.getElementById('f-suc').value || currentSuc;
   if(!prep||!suc){ toast('Ingresá el preparado y la sucursal'); return; }
   const now = new Date();
   const id  = 'PED-'+now.getFullYear()+String(now.getMonth()+1).padStart(2,'0')+
@@ -2133,12 +2168,12 @@ function createCard(){
 function exportXLS(){
   const recs = getRecs();
   if(!recs.length){ toast('No hay pedidos para exportar'); return; }
-  const headers = ['ID','Fecha','Sucursal','Encargado','Receta','Fórmula libre','WhatsApp previo',
+  const headers = ['ID','Fecha','Sucursal','Encargado','Receta','WhatsApp previo',
     'Preparado','Es nuevo','Cantidad','Presentación','Concentración','Indicaciones',
     'Urgencia','Retira','Nombre retira','DNI retira','Observaciones','Estado'];
   const rows = recs.map(r=>[
     r.id, r.fecha||r.ts?.split('T')[0]||'', r.sucursal, r.encargado,
-    r.receta, r.formulaLibre||'', r.tieneWA,
+    r.receta, r.tieneWA,
     r.preparado, r.esNuevo?'Sí':'No', r.cantidad, r.presentacion,
     r.concentracion||'', r.indicaciones||'',
     r.urgencia, r.retira||'', r.retiraNombre||'', r.retiraDNI||'',
