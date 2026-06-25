@@ -41,8 +41,7 @@ body{font-family:var(--f);background:#f5f4f0;color:var(--gt);min-height:100vh}
 .export-bar{background:var(--blanco);border-top:1px solid var(--gb);padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;max-width:640px;margin:0 auto}
 .btn-export{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--f);border:none;transition:background .15s}
 .btn-xls{background:#1a7340;color:#fff}.btn-xls:hover{background:#155c33}
-.btn-gsheet{background:#0d652d;color:#fff}.btn-gsheet:hover{background:#0a4f23}
-.btn-gsheet svg,.btn-xls svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn-xls svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 /* vade-admin */
 .vadmin-bar{background:var(--ambg);border:1px solid var(--abb);border-radius:9px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
 .vadmin-txt{font-size:12px;color:var(--am);font-weight:600}
@@ -1732,28 +1731,7 @@ function exportXLS(){
   toast('✓ Archivo descargado — abrilo con Excel');
 }
 
-// ══ GOOGLE SHEETS (Apps Script) ══════════════════════════════════════════════
-// Reemplazá SHEETS_URL con la URL de tu Apps Script (ver instrucciones al final)
-const SHEETS_URL = '';
 
-async function syncGSheets(){
-  if(!SHEETS_URL){ toast('⚠ Configurá SHEETS_URL primero — ver instrucciones'); return; }
-  const recs = getRecs();
-  if(!recs.length){ toast('No hay pedidos para sincronizar'); return; }
-  toast('Enviando a Google Sheets…');
-  try {
-    await fetch(SHEETS_URL, {
-      method:'POST',
-      mode:'no-cors',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({pedidos: recs})
-    });
-    toast('✓ Pedidos enviados a Google Sheets');
-  } catch(e){
-    toast('Error al conectar con Google Sheets');
-    console.error(e);
-  }
-}
 
 // ── TOAST ──────────────────────────────────────────────────────────────────
 function toast(msg){
@@ -2178,28 +2156,7 @@ function exportXLS(){
   toast('✓ Archivo descargado — abrilo con Excel');
 }
 
-// ══ GOOGLE SHEETS (Apps Script) ══════════════════════════════════════════════
-// Reemplazá SHEETS_URL con la URL de tu Apps Script (ver instrucciones al final)
-const SHEETS_URL = '';
 
-async function syncGSheets(){
-  if(!SHEETS_URL){ toast('⚠ Configurá SHEETS_URL primero — ver instrucciones'); return; }
-  const recs = getRecs();
-  if(!recs.length){ toast('No hay pedidos para sincronizar'); return; }
-  toast('Enviando a Google Sheets…');
-  try {
-    await fetch(SHEETS_URL, {
-      method:'POST',
-      mode:'no-cors',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({pedidos: recs})
-    });
-    toast('✓ Pedidos enviados a Google Sheets');
-  } catch(e){
-    toast('Error al conectar con Google Sheets');
-    console.error(e);
-  }
-}
 
 // ── TOAST ──────────────────────────────────────────────────────────────────
 function toast(msg){
@@ -2260,29 +2217,7 @@ kInit();
   </div>
 </div>
 
-<!-- ══ INSTRUCCIONES GOOGLE SHEETS ══════════════════════════════════════════
-  PASO 1: Abrí Google Sheets → creá una hoja nueva
-  PASO 2: En la primera fila, en A1 escribí: ID | Fecha | Sucursal | Encargado | Receta | Formula | Preparado | Cantidad | Presentación | Concentración | Indicaciones | Urgencia | Retira | Observaciones | Estado
-  PASO 3: Andá a Extensiones → Apps Script → pegá este código:
 
-    function doPost(e) {
-      const ss = SpreadsheetApp.getActiveSpreadsheet();
-      const sh = ss.getSheetByName('Pedidos') || ss.getActiveSheet();
-      const data = JSON.parse(e.postData.contents);
-      data.pedidos.forEach(r => {
-        sh.appendRow([r.id, r.fecha||'', r.sucursal, r.encargado, r.receta,
-          r.formulaLibre||'', r.preparado, r.cantidad, r.presentacion||'',
-          r.concentracion||'', r.indicaciones||'', r.urgencia,
-          r.retira||'', r.obs||'', r.estado]);
-      });
-      return ContentService.createTextOutput('OK');
-    }
-
-  PASO 4: Guardá → Implementar → Nueva implementación → Tipo: Aplicación web
-          Ejecutar como: Yo / Quién tiene acceso: Cualquier persona → Implementar
-  PASO 5: Copiá la URL que te da y pegala en const SHEETS_URL = '...' arriba
-
-══════════════════════════════════════════════════════════════════════════════ -->
 
 </body>
 </html>
